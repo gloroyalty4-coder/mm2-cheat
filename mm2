@@ -4,67 +4,109 @@ local Window = Rayfield:CreateWindow({
    Name = "Riel Hub | Developer kitaroriel",
    LoadingTitle = "Riel Hub",
    LoadingSubtitle = "by kitaroriel",
-   ConfigurationSaving = {Enabled = true, FolderName = "RielHub", FileName = "Config"},
-   KeySystem = false, 
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "RielHub", 
+      FileName = "Config"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvite", 
+      RememberJoins = true 
+   },
+   KeySystem = false,
 })
 
--- [[ 1. HOME TAB (Target Section) ]] --
+-- [[ SIDEBAR TABS SETUP ]] --
+-- These are created in the exact order of your sidebar image
 local HomeTab = Window:CreateTab("Home", "home") 
+local MainTab = Window:CreateTab("Main", "code")
+local TargetTab = Window:CreateTab("Target", "crosshair")
+local TrollTab = Window:CreateTab("Troll", "smile")
+local SpectateTab = Window:CreateTab("Spectate", "eye")
+local AnimTab = Window:CreateTab("Anim", "user")
+local EmotesTab = Window:CreateTab("Emotes", "gamepad-2")
+local SettingsTab = Window:CreateTab("Settings", "settings")
 
--- Creating the "Account Info" Section matching your image
-local AccountSection = HomeTab:CreateSection("Account Info")
+-- [[ HOME TAB CONTENT ]] --
+-- This replicates the "Account Info" image 1:1
+local HomeSection = HomeTab:CreateSection("Account Info")
 
--- User Information Label
 HomeTab:CreateLabel("User Information")
 
--- Rejoin Server Button
 HomeTab:CreateButton({
    Name = "Rejoin Server",
-   Interact = 'Refresh koneksi server', -- Subtext from your image
+   Interact = 'Refresh koneksi server',
    Callback = function()
       local ts = game:GetService("TeleportService")
       local p = game.Players.LocalPlayer
-      ts:Teleport(game.PlaceId, p) -- This actually restarts your game session
+      ts:Teleport(game.PlaceId, p)
    end,
 })
 
--- [[ 2. TROLL TAB (From previous step) ]] --
-local TrollTab = Window:CreateTab("Troll", "smile") 
+-- [[ TROLL TAB CONTENT ]] --
+-- This replicates the "Actions" image 1:1
 local TrollSection = TrollTab:CreateSection("Actions")
 
 TrollTab:CreateInput({
    Name = "Troll Target Username",
    PlaceholderText = "Enter troll target...",
-   Callback = function(Text) _G.TargetName = Text end,
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+      _G.TargetName = Text
+   end,
 })
 
 TrollTab:CreateButton({
    Name = "Void Target (Kill)",
-   Callback = function() print("Targeting: " .. (_G.TargetName or "None")) end,
+   Callback = function()
+      print("Targeting " .. tostring(_G.TargetName) .. " for Void.")
+   end,
 })
 
 TrollTab:CreateButton({
    Name = "Loop Fling Target",
-   Callback = function() print("Flinging...") end,
+   Callback = function()
+      print("Targeting " .. tostring(_G.TargetName) .. " for Fling.")
+   end,
 })
 
 TrollTab:CreateToggle({
    Name = "Walk On Air (Smart)",
    CurrentValue = false,
-   Callback = function(Value) _G.WalkOnAir = Value end,
+   Flag = "WalkAirToggle",
+   Callback = function(Value)
+      _G.WalkOnAir = Value
+      -- Logic to prevent falling
+      game:GetService("RunService").Stepped:Connect(function()
+         if _G.WalkOnAir then
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+               char.HumanoidRootPart.Velocity = Vector3.new(char.HumanoidRootPart.Velocity.X, 0, char.HumanoidRootPart.Velocity.Z)
+            end
+         end
+      end)
+   end,
 })
 
--- [[ 3. REST OF SIDEBAR (Empty Placeholders) ]] --
-local MainTab = Window:CreateTab("Main", "code") 
-local TargetTab = Window:CreateTab("Target", "crosshair") 
-local SpectateTab = Window:CreateTab("Spectate", "eye") 
-local AnimTab = Window:CreateTab("Anim", "user") 
-local EmotesTab = Window:CreateTab("Emotes", "gamepad-2") 
-local SettingsTab = Window:CreateTab("Settings", "settings") 
+-- [[ SETTINGS TAB CONTENT ]] --
+local SettingsSection = SettingsTab:CreateSection("Menu Settings")
 
+SettingsTab:CreateButton({
+   Name = "Destroy UI",
+   Callback = function()
+      Rayfield:Destroy()
+   end,
+})
+
+-- [[ PROFILE NOTIFICATION ]] --
+-- This mimics the profile info (6sixig) shown at the bottom of your image
+local Player = game.Players.LocalPlayer
 Rayfield:Notify({
-   Title = "Riel Hub Loaded",
-   Content = "Home Tab Configured.",
-   Duration = 3,
-   Image = 4483345998,
+   Title = "Riel Hub: " .. Player.DisplayName,
+   Content = "Logged in as @" .. Player.Name,
+   Duration = 6.5,
+   Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=150&h=150",
 })
+
+print("Riel Hub fully loaded.")
