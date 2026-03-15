@@ -25,394 +25,23 @@ _G.JumpEnabled = false
 _G.JumpPower = 50
 _G.Noclip = false
 _G.WalkAir = false
-
--- CHARACTER REFRESH
-local Character = Player.Character or Player.CharacterAdded:Wait()
-
-Player.CharacterAdded:Connect(function(c)
-    Character = c
-end)
-
--- FIND PLAYER
-local function GetPlayer(Name)
-    Name = Name:lower()
-    for _, v in pairs(Players:GetPlayers()) do
-        if v.Name:lower():sub(1,#Name) == Name or v.DisplayName:lower():sub(1,#Name) == Name then
-            return v
-        end
-    end
-end
-
--- CORE LOOP
-RunService.Stepped:Connect(function()
-
-    if not Character then return end
-    local Hum = Character:FindFirstChildOfClass("Humanoid")
-
-    if not Hum then return end
-
-    if _G.SpeedEnabled then
-        Hum.WalkSpeed = _G.WalkSpeed
-    else
-        Hum.WalkSpeed = 16
-    end
-
-    if _G.JumpEnabled then
-        Hum.UseJumpPower = true
-        Hum.JumpPower = _G.JumpPower
-    else
-        Hum.JumpPower = 50
-    end
-
-    if _G.Noclip then
-        for _,v in pairs(Character:GetDescendants()) do
-            if v:IsA("BasePart") then
-                v.CanCollide = false
-            end
-        end
-    end
-
-    if _G.WalkAir then
-        Hum:ChangeState(Enum.HumanoidStateType.Freefall)
-    end
-
-end)
-
--- SPECTATE UI
-local SpectateGui = Instance.new("ScreenGui")
-SpectateGui.Parent = game.CoreGui
-SpectateGui.Name = "RielSpectateOverlay"
-SpectateGui.Enabled = false
-
-local Bar = Instance.new("Frame", SpectateGui)
-Bar.BackgroundColor3 = Color3.fromRGB(15,15,15)
-Bar.Position = UDim2.new(0.5,-150,0.88,0)
-Bar.Size = UDim2.new(0,300,0,50)
-
-Instance.new("UICorner",Bar)
-
-local Stroke = Instance.new("UIStroke",Bar)
-Stroke.Color = Color3.fromRGB(180,40,40)
-Stroke.Thickness = 2
-
-local SpectateIndex = 1
-
-local function UpdateSpec(dir)
-
-    local plrs = Players:GetPlayers()
-    if #plrs == 0 then return end
-
-    SpectateIndex = (SpectateIndex + dir -1) % #plrs + 1
-
-    local target = plrs[SpectateIndex]
-
-    if target ~= Player and target.Character then
-        local hum = target.Character:FindFirstChildOfClass("Humanoid")
-        if hum then
-            Camera.CameraSubject = hum
-        end
-    end
-
-end
-
-local function CreateSpecBtn(text,pos,color,func)
-
-    local b = Instance.new("TextButton",Bar)
-
-    b.Size = UDim2.new(0,85,0,38)
-    b.Position = pos
-    b.BackgroundColor3 = color
-    b.Text = text
-    b.TextColor3 = Color3.new(1,1,1)
-    b.Font = Enum.Font.GothamBold
-    b.TextSize = 12
-
-    Instance.new("UICorner",b)
-
-    b.MouseButton1Click:Connect(func)
-
-end
-
-CreateSpecBtn("< PREV",UDim2.new(0.03,0,0.12,0),Color3.fromRGB(35,35,35),function()
-    UpdateSpec(-1)
-end)
-
-CreateSpecBtn("CLOSE",UDim2.new(0.36,0,0.12,0),Color3.fromRGB(180,40,40),function()
-
-    SpectateGui.Enabled = false
-
-    local hum = Character:FindFirstChildOfClass("Humanoid")
-
-    if hum then
-        Camera.CameraSubject = hum
-    end
-
-end)
-
-CreateSpecBtn("NEXT >",UDim2.new(0.69,0,0.12,0),Color3.fromRGB(35,35,35),function()
-    UpdateSpec(1)
-end)
-
--- TABS
-local HomeTab = Window:CreateTab("Home","home")
-local MainTab = Window:CreateTab("Main","code")
-local TargetTab = Window:CreateTab("Target","crosshair")
-local TrollTab = Window:CreateTab("Troll","smile")
-local SpectateTab = Window:CreateTab("Spectate","eye")
-local AnimTab = Window:CreateTab("Anim","user")
-local SettingsTab = Window:CreateTab("Settings","settings")
-
--- HOME
-HomeTab:CreateSection("Account Info")
-
-HomeTab:CreateButton({
-Name = "User Information",
-Interact = 'Username: '..Player.Name,
-Callback = function()
-
-Rayfield:Notify({
-Title="User Information",
-Content="Display: "..Player.DisplayName.."\nID: "..Player.UserId,
-Duration=5
-})
-
-end
-})
-
-HomeTab:CreateButton({
-Name="Rejoin Server",
-Interact="Refresh koneksi server",
-Callback=function()
-TeleportService:Teleport(game.PlaceId,Player)
-end
-})
-
-local DiscordLink="https://discord.gg/H6ccmTMd7T"
-
-HomeTab:CreateLabel("Discord Server: "..DiscordLink)
-
-HomeTab:CreateButton({
-Name="Copy Discord Link",
-Interact="Salin ke clipboard",
-Callback=function()
-
-setclipboard(DiscordLink)
-
-Rayfield:Notify({
-Title="Copied!",
-Content="Discord link copied to clipboard",
-Duration=3
-})
-
-end
-})
-
--- MOVEMENT
-MainTab:CreateSection("Movement")
-
-MainTab:CreateToggle({
-Name="Enable Speed",
-CurrentValue=false,
-Callback=function(v)
-_G.SpeedEnabled=v
-end
-})
-
-MainTab:CreateSlider({
-Name="WalkSpeed Value",
-Range={16,300},
-Increment=1,
-CurrentValue=16,
-Callback=function(v)
-_G.WalkSpeed=v
-end
-})
-
-MainTab:CreateToggle({
-Name="Enable Jump Power",
-CurrentValue=false,
-Callback=function(v)
-_G.JumpEnabled=v
-end
-})
-
-MainTab:CreateSlider({
-Name="JumpPower Value",
-Range={50,500},
-Increment=1,
-CurrentValue=50,
-Callback=function(v)
-_G.JumpPower=v
-end
-})
-
-MainTab:CreateToggle({
-Name="Noclip",
-CurrentValue=false,
-Callback=function(v)
-_G.Noclip=v
-end
-})
-
-MainTab:CreateToggle({
-Name="Walk On Air",
-CurrentValue=false,
-Callback=function(v)
-_G.WalkAir=v
-end
-})
-
--- TARGET
-TargetTab:CreateInput({
-Name="Target Username",
-PlaceholderText="Enter name...",
-Callback=function(t)
-_G.TargetName=t
-end
-})
-
-TargetTab:CreateButton({
-Name="Teleport to Target",
-Callback=function()
-
-local t=GetPlayer(_G.TargetName)
-
-if t and t.Character and Character then
-
-Character:WaitForChild("HumanoidRootPart").CFrame =
-t.Character:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0,0,-3)
-
-end
-
-end
-})
-
--- TROLL
-TrollTab:CreateInput({
-Name="Troll Target",
-PlaceholderText="Enter target...",
-Callback=function(t)
-_G.TrollTarget=t
-end
-})
-
-TrollTab:CreateButton({
-Name="Fling Target",
-Callback=function()
-
-local t=GetPlayer(_G.TrollTarget)
-
-if t and t.Character and Character then
-
-local hrp=Character:WaitForChild("HumanoidRootPart")
-local thrp=t.Character:WaitForChild("HumanoidRootPart")
-
-local old=hrp.CFrame
-
-hrp.CFrame=thrp.CFrame
-
-hrp.Velocity=Vector3.new(9e5,9e5,9e5)
-
-task.wait(0.2)
-
-hrp.Velocity=Vector3.new()
-
-hrp.CFrame=old
-
-end
-
-end
-})
-
--- SPECTATE
-SpectateTab:CreateToggle({
-Name="Enable Custom Spectator",
-CurrentValue=false,
-Callback=function(v)
-
-SpectateGui.Enabled=v
-
-if not v then
-
-local hum=Character:FindFirstChildOfClass("Humanoid")
-
-if hum then
-Camera.CameraSubject=hum
-end
-
-end
-
-end
-})
-
--- ANIM
-AnimTab:CreateButton({
-Name="Reset Character",
-Callback=function()
-Character:BreakJoints()
-end
-})
-
--- SETTINGS
-SettingsTab:CreateDropdown({
-Name="Change Theme",
-Options={"Default","AmberGlow","GreenLight","Ocean","Serenity","BloodTheme"},
-CurrentOption={"BloodTheme"},
-Callback=function(opt)
-Window:SetTheme(opt[1])
-end
-})
-
-SettingsTab:CreateButton({
-Name="Destroy UI",
-Callback=function()
-Rayfield:Destroy()alocal Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
-local Window = Rayfield:CreateWindow({
-   Name = "Riel Hub | Developer kitaroriel",
-   LoadingTitle = "Riel Hub┃Free",
-   LoadingSubtitle = "by kitaroriel",
-   ConfigurationSaving = {Enabled = true, FolderName = "RielHub", FileName = "Config"},
-   KeySystem = false,
-   Theme = "BloodTheme"
-})
-
--- SERVICES
-local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
-local RunService = game:GetService("RunService")
-local TeleportService = game:GetService("TeleportService")
-
--- GLOBALS
-_G.TargetName = ""
-_G.TrollTarget = ""
-_G.SpeedEnabled = false
-_G.WalkSpeed = 16
-_G.JumpEnabled = false
-_G.JumpPower = 50
-_G.Noclip = false
-_G.WalkAir = false
 _G.SitHead = false
 _G.Backpack = false
 
+-- CHARACTER
 local Character = Player.Character or Player.CharacterAdded:Wait()
-
 Player.CharacterAdded:Connect(function(c)
 Character = c
 end)
 
--- PLAYER FIND
+-- FIND PLAYER
 local function GetPlayer(Name)
-
 Name = Name:lower()
-
 for _,v in pairs(Players:GetPlayers()) do
 if v.Name:lower():sub(1,#Name) == Name or v.DisplayName:lower():sub(1,#Name) == Name then
 return v
 end
 end
-
 end
 
 -- CORE LOOP
@@ -448,30 +77,22 @@ end
 
 -- SIT ON HEAD
 if _G.SitHead then
-
 local target = GetPlayer(_G.TargetName)
 
 if target and target.Character then
-
 Character.HumanoidRootPart.CFrame =
 target.Character.Head.CFrame * CFrame.new(0,2,0)
-
 end
-
 end
 
 -- BACKPACK
 if _G.Backpack then
-
 local target = GetPlayer(_G.TargetName)
 
 if target and target.Character then
-
 Character.HumanoidRootPart.CFrame =
 target.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
-
 end
-
 end
 
 end)
@@ -482,7 +103,6 @@ SpectateGui.Parent = game.CoreGui
 SpectateGui.Enabled = false
 
 local Bar = Instance.new("Frame",SpectateGui)
-
 Bar.Position = UDim2.new(0.5,-150,0.88,0)
 Bar.Size = UDim2.new(0,300,0,50)
 Bar.BackgroundColor3 = Color3.fromRGB(15,15,15)
@@ -498,16 +118,13 @@ local SpectateIndex = 1
 local function UpdateSpec(dir)
 
 local plrs = Players:GetPlayers()
-
 SpectateIndex = (SpectateIndex + dir -1) % #plrs +1
 
 local target = plrs[SpectateIndex]
 
 if target ~= Player and target.Character then
-
 Camera.CameraSubject =
 target.Character:FindFirstChildOfClass("Humanoid")
-
 end
 
 end
@@ -579,7 +196,7 @@ TeleportService:Teleport(game.PlaceId,Player)
 end
 })
 
--- MAIN
+-- MOVEMENT
 MainTab:CreateSection("Movement")
 
 MainTab:CreateToggle({
@@ -652,10 +269,8 @@ Callback=function()
 local t = GetPlayer(_G.TargetName)
 
 if t and t.Character then
-
 Character.HumanoidRootPart.CFrame =
 t.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-3)
-
 end
 
 end
@@ -700,13 +315,13 @@ if t and t.Character then
 
 local hrp = Character.HumanoidRootPart
 local thrp = t.Character.HumanoidRootPart
-
 local old = hrp.CFrame
 
-hrp.CFrame = thrp.CFrame
-hrp.Velocity = Vector3.new(999999,999999,999999)
-
-task.wait(.2)
+for i=1,20 do
+hrp.CFrame = thrp.CFrame * CFrame.new(0,0,-2)
+hrp.Velocity = Vector3.new(60000,60000,60000)
+RunService.Heartbeat:Wait()
+end
 
 hrp.Velocity = Vector3.new()
 hrp.CFrame = old
@@ -733,30 +348,7 @@ end
 end
 })
 
--- ANIMATIONS
-AnimTab:CreateSection("Animation Packs")
-
-AnimTab:CreateDropdown({
-Name="Select Animation Pack",
-Options={"Original","Old School","Mage","Ninja","Zombie","Knight"},
-CurrentOption={"Original"},
-Callback=function(opt)
-
-local id
-
-if opt[1]=="Old School" then id="rbxassetid://2510235063" end
-if opt[1]=="Mage" then id="rbxassetid://707742142" end
-if opt[1]=="Ninja" then id="rbxassetid://656118852" end
-if opt[1]=="Zombie" then id="rbxassetid://616158929" end
-if opt[1]=="Knight" then id="rbxassetid://657595757" end
-
-if id then
-Character.Animate.run.RunAnim.AnimationId=id
-end
-
-end
-})
-
+-- ANIM
 AnimTab:CreateButton({
 Name="Reset Character",
 Callback=function()
@@ -765,8 +357,6 @@ end
 })
 
 -- SETTINGS
-SettingsTab:CreateSection("Interface Theme")
-
 SettingsTab:CreateDropdown({
 Name="Change Theme",
 Options={"Default","AmberGlow","GreenLight","Ocean","Serenity","BloodTheme"},
@@ -776,20 +366,10 @@ Window:SetTheme(opt[1])
 end
 })
 
-SettingsTab:CreateSection("Menu Config")
-
 SettingsTab:CreateButton({
 Name="Destroy UI",
 Callback=function()
 Rayfield:Destroy()
-end
-})
-
-Rayfield:Notify({
-Title=Player.DisplayName,
-Content="Riel Hub┃Free Loaded!",
-Duration=5
-})
 end
 })
 
