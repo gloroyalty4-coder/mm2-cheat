@@ -1,9 +1,9 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Riel Hub | Developer kitaroriel",
+   Name = "Riel Hub | Developer 2k6v",
    LoadingTitle = "Riel Hub V3 Premium",
-   LoadingSubtitle = "by kitaroriel",
+   LoadingSubtitle = "by 2k6v",
    ConfigurationSaving = {Enabled = true, FolderName = "RielHub", FileName = "Config"},
    KeySystem = false, 
 })
@@ -131,7 +131,7 @@ HomeTab:CreateButton({
 HomeTab:CreateSection("Server")
 HomeTab:CreateButton({
    Name = "Rejoin Server",
-   Interact = 'Refresh koneksi server',
+   Interact = 'Refresh 2k6v server',
    Callback = function() TeleportService:Teleport(game.PlaceId, Player) end,
 })
 
