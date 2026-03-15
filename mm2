@@ -1,0 +1,31 @@
+-- Simple UI Hub Structure (Conceptual)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MyCustomHub"
+ScreenGui.Parent = game.CoreGui -- Use CoreGui so it doesn't delete on death
+
+-- Main Background (The blurred/dark frame)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 550, 0, 350)
+MainFrame.Position = UDim2.new(0.5, -275, 0.5, -175)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 25, 25) -- Dark reddish tint like the image
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+-- Corner Rounding
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+-- Sidebar for Navigation
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 150, 1, 0)
+Sidebar.BackgroundColor3 = Color3.fromRGB(20, 15, 15)
+Sidebar.BorderSizePixel = 0
+Sidebar.Parent = MainFrame
+
+-- Add a UI List Layout for the buttons
+local Layout = Instance.new("UIListLayout")
+Layout.Parent = Sidebar
+Layout.Padding = UDim.new(0, 5)
+
+print("Hub UI Initialized. Use a UI Library like Rayfield for the blur effects!")
