@@ -1,11 +1,12 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Inferno Hub | Developer 2k6v",
-   LoadingTitle = "Inferno Hub┃Free",
-   LoadingSubtitle = "by 2k6v",
+   Name = "Riel Hub | Developer kitaroriel",
+   LoadingTitle = "Riel Hub┃Free",
+   LoadingSubtitle = "by kitaroriel",
    ConfigurationSaving = {Enabled = true, FolderName = "RielHub", FileName = "Config"},
-   KeySystem = false, 
+   KeySystem = false,
+   Theme = "BloodTheme" -- Sets the dark burgundy theme from your image
 })
 
 -- [[ GLOBAL VARIABLES & LOGIC ]] --
@@ -63,7 +64,7 @@ Bar.Position = UDim2.new(0.5, -150, 0.88, 0)
 Bar.Size = UDim2.new(0, 300, 0, 50)
 Instance.new("UICorner", Bar).CornerRadius = UDim.new(0, 8)
 local Stroke = Instance.new("UIStroke", Bar)
-Stroke.Color = Color3.fromRGB(0, 240, 255)
+Stroke.Color = Color3.fromRGB(180, 40, 40) -- Themed red to match UI
 Stroke.Thickness = 2
 
 local function CreateSpecBtn(text, pos, color, func)
@@ -89,13 +90,13 @@ local function UpdateSpec(dir)
 end
 
 CreateSpecBtn("< PREV", UDim2.new(0.03, 0, 0.12, 0), Color3.fromRGB(35, 35, 35), function() UpdateSpec(-1) end)
-CreateSpecBtn("CLOSE", UDim2.new(0.36, 0, 0.12, 0), Color3.fromRGB(255, 45, 45), function() 
+CreateSpecBtn("CLOSE", UDim2.new(0.36, 0, 0.12, 0), Color3.fromRGB(180, 40, 40), function() 
     SpectateGui.Enabled = false
     Camera.CameraSubject = Player.Character:FindFirstChildOfClass("Humanoid")
 end)
 CreateSpecBtn("NEXT >", UDim2.new(0.69, 0, 0.12, 0), Color3.fromRGB(35, 35, 35), function() UpdateSpec(1) end)
 
--- [[ TAB INITIALIZATION ]] --
+-- [[ TAB INITIALIZATION - ORDERED TO MATCH IMAGE ]] --
 local HomeTab = Window:CreateTab("Home", "home")
 local MainTab = Window:CreateTab("Main", "code")
 local TargetTab = Window:CreateTab("Target", "crosshair")
@@ -104,15 +105,29 @@ local SpectateTab = Window:CreateTab("Spectate", "eye")
 local AnimTab = Window:CreateTab("Anim", "user")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
--- [[ HOME - REAL ACCOUNT DATA & LOCKED DISCORD ]] --
+-- [[ HOME - REPLICATING THE CENTER LAYOUT OF YOUR IMAGE ]] --
 HomeTab:CreateSection("Account Info")
-HomeTab:CreateLabel("Username: " .. Player.Name)
-HomeTab:CreateLabel("Display: " .. Player.DisplayName)
-HomeTab:CreateLabel("User ID: " .. Player.UserId)
+
+HomeTab:CreateButton({
+   Name = "User Information",
+   Interact = 'Username: ' .. Player.Name,
+   Callback = function()
+       Rayfield:Notify({
+           Title = "User Information",
+           Content = "Display: " .. Player.DisplayName .. "\nID: " .. Player.UserId,
+           Duration = 5
+       })
+   end,
+})
+
+HomeTab:CreateButton({
+   Name = "Rejoin Server",
+   Interact = 'Refresh koneksi server', -- Matching the text in your image
+   Callback = function() TeleportService:Teleport(game.PlaceId, Player) end,
+})
 
 HomeTab:CreateSection("Community")
 local DiscordLink = "https://discord.gg/H6ccmTMd7T"
--- FIXED: Changed Input to Label so users cannot edit the link
 HomeTab:CreateLabel("Discord Server: " .. DiscordLink) 
 HomeTab:CreateButton({
    Name = "Copy Discord Link",
@@ -126,13 +141,6 @@ HomeTab:CreateButton({
            Image = 4483362458
        })
    end,
-})
-
-HomeTab:CreateSection("Server")
-HomeTab:CreateButton({
-   Name = "Rejoin Server",
-   Interact = 'Refresh 2k6v server',
-   Callback = function() TeleportService:Teleport(game.PlaceId, Player) end,
 })
 
 -- [[ MAIN - MOVEMENT ]] --
@@ -233,9 +241,9 @@ SettingsTab:CreateSection("Interface Theme")
 SettingsTab:CreateDropdown({
    Name = "Change Theme",
    Options = {"Default", "AmberGlow", "GreenLight", "Ocean", "Serenity", "BloodTheme"},
-   CurrentOption = {"Default"},
+   CurrentOption = {"BloodTheme"},
    Callback = function(Option) 
-       Window:SetTheme(Option[1]) -- Updates UI colors live
+       Window:SetTheme(Option[1])
    end,
 })
 
@@ -244,7 +252,7 @@ SettingsTab:CreateButton({Name = "Destroy UI", Callback = function() Rayfield:De
 
 Rayfield:Notify({
    Title = Player.DisplayName,
-   Content = "Inferno Hub┃Free!",
+   Content = "Riel Hub┃Free Loaded!",
    Duration = 5,
    Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=150&h=150",
 })
