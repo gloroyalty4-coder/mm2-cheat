@@ -22,7 +22,7 @@ _G.JumpPower = 50
 _G.Noclip = false
 local SpectateIndex = 1
 
--- Movement & Noclip Loop
+-- Core Loop for Movement & Noclip Persistence
 RunService.Stepped:Connect(function()
     if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
         local Hum = Player.Character:FindFirstChildOfClass("Humanoid")
@@ -36,7 +36,7 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- [[ SPECTATE OVERLAY UI ]] --
+-- [[ SPECTATE OVERLAY UI (Image 9) ]] --
 local SpectateGui = Instance.new("ScreenGui")
 SpectateGui.Name = "SpectateOverlay"
 SpectateGui.Parent = game.CoreGui
@@ -50,7 +50,7 @@ Bar.Position = UDim2.new(0.5, -150, 0.85, 0)
 Bar.Size = UDim2.new(0, 300, 0, 50)
 Instance.new("UICorner", Bar).CornerRadius = UDim.new(0, 10)
 local Stroke = Instance.new("UIStroke", Bar)
-Stroke.Color = Color3.fromRGB(0, 255, 255)
+Stroke.Color = Color3.fromRGB(0, 255, 255) -- Cyan Border
 Stroke.Thickness = 2
 
 local function CreateBtn(text, pos, color)
@@ -67,7 +67,7 @@ local function CreateBtn(text, pos, color)
 end
 
 local PrevBtn = CreateBtn("< PREV", UDim2.new(0.05, 0, 0.1, 0), Color3.fromRGB(40, 40, 40))
-local CloseBtn = CreateBtn("CLOSE", UDim2.new(0.37, 0, 0.1, 0), Color3.fromRGB(255, 50, 50))
+local CloseBtn = CreateBtn("CLOSE", UDim2.new(0.37, 0, 0.1, 0), Color3.fromRGB(255, 50, 50)) -- Red
 local NextBtn = CreateBtn("NEXT >", UDim2.new(0.68, 0, 0.1, 0), Color3.fromRGB(40, 40, 40))
 
 local function UpdateSpectate(dir)
@@ -75,7 +75,6 @@ local function UpdateSpectate(dir)
     SpectateIndex = SpectateIndex + dir
     if SpectateIndex > #players then SpectateIndex = 1 end
     if SpectateIndex < 1 then SpectateIndex = #players end
-    
     local target = players[SpectateIndex]
     if target and target.Character and target.Character:FindFirstChild("Humanoid") then
         Camera.CameraSubject = target.Character.Humanoid
@@ -89,7 +88,7 @@ CloseBtn.MouseButton1Click:Connect(function()
     Camera.CameraSubject = Player.Character.Humanoid 
 end)
 
--- [[ SIDEBAR TABS ]] --
+-- [[ SIDEBAR NAVIGATION (Image 2) ]] --
 local HomeTab = Window:CreateTab("Home", "home") 
 local MainTab = Window:CreateTab("Main", "code")
 local TargetTab = Window:CreateTab("Target", "crosshair")
@@ -99,7 +98,7 @@ local AnimTab = Window:CreateTab("Anim", "user")
 local EmotesTab = Window:CreateTab("Emotes", "gamepad-2")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
--- [[ CONTENT - HOME ]] --
+-- [[ HOME TAB (Image 3) ]] --
 local AccountSection = HomeTab:CreateSection("Account Info")
 HomeTab:CreateLabel("User Information")
 HomeTab:CreateButton({
@@ -108,7 +107,7 @@ HomeTab:CreateButton({
    Callback = function() TeleportService:Teleport(game.PlaceId, Player) end,
 })
 
--- [[ CONTENT - MAIN ]] --
+-- [[ MAIN TAB (Image 4 & 5) ]] --
 local MovementSection = MainTab:CreateSection("Movement")
 MainTab:CreateToggle({Name = "Enable Speed", Interact = 'Aktifkan kecepatan lari', Callback = function(V) _G.SpeedEnabled = V end})
 MainTab:CreateSlider({Name = "WalkSpeed Value", Range = {16, 300}, CurrentValue = 16, Callback = function(V) _G.WalkSpeed = V end})
@@ -120,7 +119,7 @@ MainTab:CreateToggle({Name = "Noclip", Interact = 'Tembus tembok', Callback = fu
 MainTab:CreateToggle({Name = "Fly Mode (Auraverse)", Interact = 'Terbang dengan gaya Auraverse', Callback = function(V) end})
 MainTab:CreateSlider({Name = "Fly Speed", Range = {1, 500}, CurrentValue = 50, Callback = function(V) end})
 
--- [[ CONTENT - TARGET ]] --
+-- [[ TARGET TAB (Image 6 & 7) ]] --
 local TargetSelection = TargetTab:CreateSection("Target Selection")
 TargetTab:CreateInput({Name = "Target Username", PlaceholderText = "Enter name...", Interact = "Masukkan nama player (singkatan bisa)", Callback = function(T) _G.TargetName = T end})
 TargetTab:CreateButton({Name = "Teleport to Target", Interact = "Teleportasi instan ke posisi target", Callback = function() end})
@@ -132,14 +131,14 @@ TargetTab:CreateToggle({Name = "Backpack (Front)", Interact = "Duduk di depan ta
 TargetTab:CreateToggle({Name = "Sit on Head", Interact = "Duduk di kepala target", Callback = function(V) end})
 TargetTab:CreateToggle({Name = "Carry Player", Interact = "Gendong target (Depan)", Callback = function(V) end})
 
--- [[ CONTENT - TROLL ]] --
+-- [[ TROLL TAB (Image 1) ]] --
 local TrollActions = TrollTab:CreateSection("Actions")
 TrollTab:CreateInput({Name = "Troll Target Username", PlaceholderText = "Enter troll target...", Interact = "Masukkan target khusus untuk fitur Troll", Callback = function(T) _G.TargetName = T end})
 TrollTab:CreateButton({Name = "Void Target (Kill)", Interact = "Teleport target troll ke void", Callback = function() end})
 TrollTab:CreateButton({Name = "Loop Fling Target", Interact = "Fling target troll berulang kali", Callback = function() end})
 TrollTab:CreateToggle({Name = "Walk On Air (Smart)", Interact = "Lantai muncul otomatis (Mati saat Backpack)", Callback = function(V) end})
 
--- [[ CONTENT - SPECTATE ]] --
+-- [[ SPECTATE TAB (Image 8) ]] --
 local SpectateMode = SpectateTab:CreateSection("Spectator Mode")
 SpectateTab:CreateToggle({
    Name = "Enable Custom Spectator",
@@ -151,10 +150,26 @@ SpectateTab:CreateToggle({
 })
 SpectateTab:CreateLabel("Info")
 
--- [[ PROFILE NOTIFICATION ]] --
+-- [[ ANIM TAB (Image 10) ]] --
+local AnimSection = AnimTab:CreateSection("Animation Packs")
+AnimTab:CreateDropdown({
+   Name = "Select Animation Pack",
+   Options = {"Original", "Old School", "Mage", "Ninja", "Zombie", "Knight", "Levitation", "Astronaut"},
+   CurrentOption = {"Original"},
+   MultipleOptions = false,
+   Interact = "Ganti gaya jalan/lari/diam",
+   Callback = function(Option) end,
+})
+AnimTab:CreateButton({
+   Name = "Reset Character",
+   Interact = "Bunuh diri untuk reset animasi",
+   Callback = function() if Player.Character then Player.Character.Humanoid.Health = 0 end end,
+})
+
+-- [[ PROFILE SIDEBAR (Image 1 & 2) ]] --
 Rayfield:Notify({
    Title = Player.DisplayName,
-   Content = "@" .. Player.Name,
+   Content = "@" .. Player.Name .. " (6sixig)",
    Duration = 5,
    Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=150&h=150",
 })
