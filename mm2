@@ -1,8 +1,8 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Riel Hub | Developer 2k6v",
-   LoadingTitle = "Riel Hub V3 Premium",
+   Name = "Inferno Hub | Developer 2k6v",
+   LoadingTitle = "Inferno Hub┃Free",
    LoadingSubtitle = "by 2k6v",
    ConfigurationSaving = {Enabled = true, FolderName = "RielHub", FileName = "Config"},
    KeySystem = false, 
@@ -111,7 +111,7 @@ HomeTab:CreateLabel("Display: " .. Player.DisplayName)
 HomeTab:CreateLabel("User ID: " .. Player.UserId)
 
 HomeTab:CreateSection("Community")
-local DiscordLink = "https://discord.gg/rielhub"
+local DiscordLink = "https://discord.gg/H6ccmTMd7T"
 -- FIXED: Changed Input to Label so users cannot edit the link
 HomeTab:CreateLabel("Discord Server: " .. DiscordLink) 
 HomeTab:CreateButton({
@@ -244,7 +244,7 @@ SettingsTab:CreateButton({Name = "Destroy UI", Callback = function() Rayfield:De
 
 Rayfield:Notify({
    Title = Player.DisplayName,
-   Content = "Riel Hub V3 Premium Fixed!",
+   Content = "Inferno Hub┃Free!",
    Duration = 5,
    Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=150&h=150",
 })
