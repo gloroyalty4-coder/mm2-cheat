@@ -10,6 +10,7 @@ local Window = Rayfield:CreateWindow({
 
 -- [[ GLOBAL VARIABLES & LOGIC ]] --
 local Player = game.Players.LocalPlayer
+local Camera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 
@@ -19,8 +20,9 @@ _G.WalkSpeed = 16
 _G.JumpEnabled = false
 _G.JumpPower = 50
 _G.Noclip = false
+local SpectateIndex = 1
 
--- Core Loop for Movement & Utility functions
+-- Movement & Noclip Loop
 RunService.Stepped:Connect(function()
     if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
         local Hum = Player.Character:FindFirstChildOfClass("Humanoid")
@@ -34,7 +36,60 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- [[ SIDEBAR NAVIGATION ]] --
+-- [[ SPECTATE OVERLAY UI ]] --
+local SpectateGui = Instance.new("ScreenGui")
+SpectateGui.Name = "SpectateOverlay"
+SpectateGui.Parent = game.CoreGui
+SpectateGui.Enabled = false
+
+local Bar = Instance.new("Frame")
+Bar.Name = "Bar"
+Bar.Parent = SpectateGui
+Bar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Bar.Position = UDim2.new(0.5, -150, 0.85, 0)
+Bar.Size = UDim2.new(0, 300, 0, 50)
+Instance.new("UICorner", Bar).CornerRadius = UDim.new(0, 10)
+local Stroke = Instance.new("UIStroke", Bar)
+Stroke.Color = Color3.fromRGB(0, 255, 255)
+Stroke.Thickness = 2
+
+local function CreateBtn(text, pos, color)
+    local b = Instance.new("TextButton")
+    b.Parent = Bar
+    b.Size = UDim2.new(0, 80, 0, 40)
+    b.Position = pos
+    b.BackgroundColor3 = color
+    b.Text = text
+    b.TextColor3 = Color3.new(1,1,1)
+    b.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", b)
+    return b
+end
+
+local PrevBtn = CreateBtn("< PREV", UDim2.new(0.05, 0, 0.1, 0), Color3.fromRGB(40, 40, 40))
+local CloseBtn = CreateBtn("CLOSE", UDim2.new(0.37, 0, 0.1, 0), Color3.fromRGB(255, 50, 50))
+local NextBtn = CreateBtn("NEXT >", UDim2.new(0.68, 0, 0.1, 0), Color3.fromRGB(40, 40, 40))
+
+local function UpdateSpectate(dir)
+    local players = game.Players:GetPlayers()
+    SpectateIndex = SpectateIndex + dir
+    if SpectateIndex > #players then SpectateIndex = 1 end
+    if SpectateIndex < 1 then SpectateIndex = #players end
+    
+    local target = players[SpectateIndex]
+    if target and target.Character and target.Character:FindFirstChild("Humanoid") then
+        Camera.CameraSubject = target.Character.Humanoid
+    end
+end
+
+NextBtn.MouseButton1Click:Connect(function() UpdateSpectate(1) end)
+PrevBtn.MouseButton1Click:Connect(function() UpdateSpectate(-1) end)
+CloseBtn.MouseButton1Click:Connect(function() 
+    SpectateGui.Enabled = false
+    Camera.CameraSubject = Player.Character.Humanoid 
+end)
+
+-- [[ SIDEBAR TABS ]] --
 local HomeTab = Window:CreateTab("Home", "home") 
 local MainTab = Window:CreateTab("Main", "code")
 local TargetTab = Window:CreateTab("Target", "crosshair")
@@ -44,7 +99,7 @@ local AnimTab = Window:CreateTab("Anim", "user")
 local EmotesTab = Window:CreateTab("Emotes", "gamepad-2")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
--- [[ HOME TAB ]] --
+-- [[ CONTENT - HOME ]] --
 local AccountSection = HomeTab:CreateSection("Account Info")
 HomeTab:CreateLabel("User Information")
 HomeTab:CreateButton({
@@ -53,72 +108,23 @@ HomeTab:CreateButton({
    Callback = function() TeleportService:Teleport(game.PlaceId, Player) end,
 })
 
--- [[ MAIN TAB ]] --
+-- [[ CONTENT - MAIN ]] --
 local MovementSection = MainTab:CreateSection("Movement")
-MainTab:CreateToggle({
-   Name = "Enable Speed", 
-   Interact = 'Aktifkan kecepatan lari', 
-   Callback = function(V) _G.SpeedEnabled = V end
-})
-MainTab:CreateSlider({
-   Name = "WalkSpeed Value", 
-   Range = {16, 300}, 
-   CurrentValue = 16, 
-   Callback = function(V) _G.WalkSpeed = V end
-})
-MainTab:CreateToggle({
-   Name = "Enable Jump Power", 
-   Interact = 'Aktifkan kekuatan lompat', 
-   Callback = function(V) _G.JumpEnabled = V end
-})
-MainTab:CreateSlider({
-   Name = "JumpPower Value", 
-   Range = {50, 500}, 
-   CurrentValue = 50, 
-   Callback = function(V) _G.JumpPower = V end
-})
+MainTab:CreateToggle({Name = "Enable Speed", Interact = 'Aktifkan kecepatan lari', Callback = function(V) _G.SpeedEnabled = V end})
+MainTab:CreateSlider({Name = "WalkSpeed Value", Range = {16, 300}, CurrentValue = 16, Callback = function(V) _G.WalkSpeed = V end})
+MainTab:CreateToggle({Name = "Enable Jump Power", Interact = 'Aktifkan kekuatan lompat', Callback = function(V) _G.JumpEnabled = V end})
+MainTab:CreateSlider({Name = "JumpPower Value", Range = {50, 500}, CurrentValue = 50, Callback = function(V) _G.JumpPower = V end})
 
 local UtilitySection = MainTab:CreateSection("Utility")
-MainTab:CreateToggle({
-   Name = "Noclip", 
-   Interact = 'Tembus tembok', 
-   Callback = function(V) _G.Noclip = V end
-})
-MainTab:CreateToggle({
-   Name = "Fly Mode (Auraverse)", 
-   Interact = 'Terbang dengan gaya Auraverse', 
-   Callback = function(V) end
-})
-MainTab:CreateSlider({
-   Name = "Fly Speed", 
-   Range = {1, 500}, 
-   CurrentValue = 50, 
-   Callback = function(V) _G.FlySpeed = V end
-})
+MainTab:CreateToggle({Name = "Noclip", Interact = 'Tembus tembok', Callback = function(V) _G.Noclip = V end})
+MainTab:CreateToggle({Name = "Fly Mode (Auraverse)", Interact = 'Terbang dengan gaya Auraverse', Callback = function(V) end})
+MainTab:CreateSlider({Name = "Fly Speed", Range = {1, 500}, CurrentValue = 50, Callback = function(V) end})
 
--- [[ TARGET TAB ]] --
-local TargetSelectionSection = TargetTab:CreateSection("Target Selection")
-TargetTab:CreateInput({
-   Name = "Target Username",
-   PlaceholderText = "Enter name...",
-   Interact = "Masukkan nama player (singkatan bisa)",
-   Callback = function(Text) _G.TargetName = Text end,
-})
-TargetTab:CreateButton({
-   Name = "Teleport to Target",
-   Interact = "Teleportasi instan ke posisi target",
-   Callback = function() 
-      local target = game.Players:FindFirstChild(_G.TargetName)
-      if target and target.Character then
-         Player.Character:MoveTo(target.Character.HumanoidRootPart.Position)
-      end
-   end,
-})
-TargetTab:CreateButton({
-   Name = "Select Tool (Click Player)",
-   Interact = "Klik player menggunakan tool untuk memilih target",
-   Callback = function() end,
-})
+-- [[ CONTENT - TARGET ]] --
+local TargetSelection = TargetTab:CreateSection("Target Selection")
+TargetTab:CreateInput({Name = "Target Username", PlaceholderText = "Enter name...", Interact = "Masukkan nama player (singkatan bisa)", Callback = function(T) _G.TargetName = T end})
+TargetTab:CreateButton({Name = "Teleport to Target", Interact = "Teleportasi instan ke posisi target", Callback = function() end})
+TargetTab:CreateButton({Name = "Select Tool (Click Player)", Interact = "Klik player menggunakan tool untuk memilih target", Callback = function() end})
 
 local CarrySection = TargetTab:CreateSection("Carry & Sit")
 TargetTab:CreateToggle({Name = "Backpack (Sit on Back)", Interact = "Duduk di punggung target", Callback = function(V) end})
@@ -126,39 +132,26 @@ TargetTab:CreateToggle({Name = "Backpack (Front)", Interact = "Duduk di depan ta
 TargetTab:CreateToggle({Name = "Sit on Head", Interact = "Duduk di kepala target", Callback = function(V) end})
 TargetTab:CreateToggle({Name = "Carry Player", Interact = "Gendong target (Depan)", Callback = function(V) end})
 
--- [[ TROLL TAB ]] --
-local ActionsSection = TrollTab:CreateSection("Actions")
-TrollTab:CreateInput({
-   Name = "Troll Target Username",
-   PlaceholderText = "Enter troll target...",
-   Interact = "Masukkan target khusus untuk fitur Troll",
-   Callback = function(Text) _G.TargetName = Text end,
-})
-TrollTab:CreateButton({
-   Name = "Void Target (Kill)",
-   Interact = "Teleport target troll ke void",
-   Callback = function() end,
-})
-TrollTab:CreateButton({
-   Name = "Loop Fling Target",
-   Interact = "Fling target troll berulang kali",
-   Callback = function() end,
-})
-TrollTab:CreateToggle({
-   Name = "Walk On Air (Smart)",
-   Interact = "Lantai muncul otomatis (Mati saat Backpack)",
-   Callback = function(V) end,
-})
+-- [[ CONTENT - TROLL ]] --
+local TrollActions = TrollTab:CreateSection("Actions")
+TrollTab:CreateInput({Name = "Troll Target Username", PlaceholderText = "Enter troll target...", Interact = "Masukkan target khusus untuk fitur Troll", Callback = function(T) _G.TargetName = T end})
+TrollTab:CreateButton({Name = "Void Target (Kill)", Interact = "Teleport target troll ke void", Callback = function() end})
+TrollTab:CreateButton({Name = "Loop Fling Target", Interact = "Fling target troll berulang kali", Callback = function() end})
+TrollTab:CreateToggle({Name = "Walk On Air (Smart)", Interact = "Lantai muncul otomatis (Mati saat Backpack)", Callback = function(V) end})
 
--- [[ SETTINGS TAB ]] --
-local SettingSection = SettingsTab:CreateSection("Menu Config")
-SettingsTab:CreateButton({
-    Name = "Destroy UI",
-    Callback = function() Rayfield:Destroy() end,
+-- [[ CONTENT - SPECTATE ]] --
+local SpectateMode = SpectateTab:CreateSection("Spectator Mode")
+SpectateTab:CreateToggle({
+   Name = "Enable Custom Spectator",
+   Interact = "Spectate dengan tampilan Overlay Modern",
+   Callback = function(Value)
+      SpectateGui.Enabled = Value
+      if not Value then Camera.CameraSubject = Player.Character.Humanoid else UpdateSpectate(0) end
+   end,
 })
+SpectateTab:CreateLabel("Info")
 
--- [[ PLAYER PROFILE SECTION ]] --
--- Replicates the "6sixig" bottom-sidebar profile info
+-- [[ PROFILE NOTIFICATION ]] --
 Rayfield:Notify({
    Title = Player.DisplayName,
    Content = "@" .. Player.Name,
