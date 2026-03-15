@@ -13,13 +13,14 @@ local Player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 
+_G.TargetName = ""
 _G.SpeedEnabled = false
 _G.WalkSpeed = 16
 _G.JumpEnabled = false
 _G.JumpPower = 50
 _G.Noclip = false
 
--- Core Loop to ensure Speed, Jump, and Noclip stay active
+-- Core Loop for Movement & Utility functions
 RunService.Stepped:Connect(function()
     if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
         local Hum = Player.Character:FindFirstChildOfClass("Humanoid")
@@ -33,7 +34,7 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- [[ SIDEBAR TABS ]] --
+-- [[ SIDEBAR NAVIGATION ]] --
 local HomeTab = Window:CreateTab("Home", "home") 
 local MainTab = Window:CreateTab("Main", "code")
 local TargetTab = Window:CreateTab("Target", "crosshair")
@@ -43,7 +44,7 @@ local AnimTab = Window:CreateTab("Anim", "user")
 local EmotesTab = Window:CreateTab("Emotes", "gamepad-2")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
--- [[ HOME TAB CONTENT ]] --
+-- [[ HOME TAB ]] --
 local AccountSection = HomeTab:CreateSection("Account Info")
 HomeTab:CreateLabel("User Information")
 HomeTab:CreateButton({
@@ -52,102 +53,112 @@ HomeTab:CreateButton({
    Callback = function() TeleportService:Teleport(game.PlaceId, Player) end,
 })
 
--- [[ MAIN TAB CONTENT - MOVEMENT & UTILITY ]] --
+-- [[ MAIN TAB ]] --
 local MovementSection = MainTab:CreateSection("Movement")
-
 MainTab:CreateToggle({
-   Name = "Enable Speed",
-   CurrentValue = false,
-   Interact = 'Aktifkan kecepatan lari',
-   Callback = function(Value) _G.SpeedEnabled = Value end,
+   Name = "Enable Speed", 
+   Interact = 'Aktifkan kecepatan lari', 
+   Callback = function(V) _G.SpeedEnabled = V end
 })
-
 MainTab:CreateSlider({
-   Name = "WalkSpeed Value",
-   Range = {16, 300},
-   Increment = 1,
-   CurrentValue = 16,
-   Callback = function(Value) _G.WalkSpeed = Value end,
+   Name = "WalkSpeed Value", 
+   Range = {16, 300}, 
+   CurrentValue = 16, 
+   Callback = function(V) _G.WalkSpeed = V end
 })
-
 MainTab:CreateToggle({
-   Name = "Enable Jump Power",
-   CurrentValue = false,
-   Interact = 'Aktifkan kekuatan lompat',
-   Callback = function(Value) _G.JumpEnabled = Value end,
+   Name = "Enable Jump Power", 
+   Interact = 'Aktifkan kekuatan lompat', 
+   Callback = function(V) _G.JumpEnabled = V end
 })
-
 MainTab:CreateSlider({
-   Name = "JumpPower Value",
-   Range = {50, 500},
-   Increment = 1,
-   CurrentValue = 50,
-   Callback = function(Value) _G.JumpPower = Value end,
+   Name = "JumpPower Value", 
+   Range = {50, 500}, 
+   CurrentValue = 50, 
+   Callback = function(V) _G.JumpPower = V end
 })
 
 local UtilitySection = MainTab:CreateSection("Utility")
-
 MainTab:CreateToggle({
-   Name = "Noclip",
-   CurrentValue = false,
-   Interact = 'Tembus tembok',
-   Callback = function(Value) _G.Noclip = Value end,
+   Name = "Noclip", 
+   Interact = 'Tembus tembok', 
+   Callback = function(V) _G.Noclip = V end
+})
+MainTab:CreateToggle({
+   Name = "Fly Mode (Auraverse)", 
+   Interact = 'Terbang dengan gaya Auraverse', 
+   Callback = function(V) end
+})
+MainTab:CreateSlider({
+   Name = "Fly Speed", 
+   Range = {1, 500}, 
+   CurrentValue = 50, 
+   Callback = function(V) _G.FlySpeed = V end
 })
 
-MainTab:CreateToggle({
-   Name = "Fly Mode (Auraverse)",
-   CurrentValue = false,
-   Interact = 'Terbang dengan gaya Auraverse',
-   Callback = function(Value) 
-       -- Fly logic toggle
+-- [[ TARGET TAB ]] --
+local TargetSelectionSection = TargetTab:CreateSection("Target Selection")
+TargetTab:CreateInput({
+   Name = "Target Username",
+   PlaceholderText = "Enter name...",
+   Interact = "Masukkan nama player (singkatan bisa)",
+   Callback = function(Text) _G.TargetName = Text end,
+})
+TargetTab:CreateButton({
+   Name = "Teleport to Target",
+   Interact = "Teleportasi instan ke posisi target",
+   Callback = function() 
+      local target = game.Players:FindFirstChild(_G.TargetName)
+      if target and target.Character then
+         Player.Character:MoveTo(target.Character.HumanoidRootPart.Position)
+      end
    end,
 })
-
-MainTab:CreateSlider({
-   Name = "Fly Speed",
-   Range = {1, 500},
-   Increment = 1,
-   CurrentValue = 50,
-   Callback = function(Value) _G.FlySpeed = Value end,
+TargetTab:CreateButton({
+   Name = "Select Tool (Click Player)",
+   Interact = "Klik player menggunakan tool untuk memilih target",
+   Callback = function() end,
 })
 
--- [[ TROLL TAB CONTENT ]] --
-local TrollSection = TrollTab:CreateSection("Actions")
+local CarrySection = TargetTab:CreateSection("Carry & Sit")
+TargetTab:CreateToggle({Name = "Backpack (Sit on Back)", Interact = "Duduk di punggung target", Callback = function(V) end})
+TargetTab:CreateToggle({Name = "Backpack (Front)", Interact = "Duduk di depan target", Callback = function(V) end})
+TargetTab:CreateToggle({Name = "Sit on Head", Interact = "Duduk di kepala target", Callback = function(V) end})
+TargetTab:CreateToggle({Name = "Carry Player", Interact = "Gendong target (Depan)", Callback = function(V) end})
 
+-- [[ TROLL TAB ]] --
+local ActionsSection = TrollTab:CreateSection("Actions")
 TrollTab:CreateInput({
    Name = "Troll Target Username",
    PlaceholderText = "Enter troll target...",
+   Interact = "Masukkan target khusus untuk fitur Troll",
    Callback = function(Text) _G.TargetName = Text end,
 })
-
 TrollTab:CreateButton({
    Name = "Void Target (Kill)",
    Interact = "Teleport target troll ke void",
-   Callback = function() print("Voiding " .. tostring(_G.TargetName)) end,
+   Callback = function() end,
 })
-
 TrollTab:CreateButton({
    Name = "Loop Fling Target",
    Interact = "Fling target troll berulang kali",
-   Callback = function() print("Flinging " .. tostring(_G.TargetName)) end,
+   Callback = function() end,
 })
-
 TrollTab:CreateToggle({
    Name = "Walk On Air (Smart)",
-   CurrentValue = false,
    Interact = "Lantai muncul otomatis (Mati saat Backpack)",
-   Callback = function(Value) _G.WalkOnAir = Value end,
+   Callback = function(V) end,
 })
 
 -- [[ SETTINGS TAB ]] --
-local SettingsSection = SettingsTab:CreateSection("Interface")
+local SettingSection = SettingsTab:CreateSection("Menu Config")
 SettingsTab:CreateButton({
     Name = "Destroy UI",
     Callback = function() Rayfield:Destroy() end,
 })
 
--- [[ PROFILE NOTIFICATION ]] --
--- This mimics the "6sixig" layout at the bottom left of your image
+-- [[ PLAYER PROFILE SECTION ]] --
+-- Replicates the "6sixig" bottom-sidebar profile info
 Rayfield:Notify({
    Title = Player.DisplayName,
    Content = "@" .. Player.Name,
