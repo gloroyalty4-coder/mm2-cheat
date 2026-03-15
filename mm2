@@ -104,20 +104,16 @@ local SpectateTab = Window:CreateTab("Spectate", "eye")
 local AnimTab = Window:CreateTab("Anim", "user")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
--- [[ HOME - REAL ACCOUNT DATA & DISCORD ]] --
+-- [[ HOME - REAL ACCOUNT DATA & LOCKED DISCORD ]] --
 HomeTab:CreateSection("Account Info")
 HomeTab:CreateLabel("Username: " .. Player.Name)
 HomeTab:CreateLabel("Display: " .. Player.DisplayName)
 HomeTab:CreateLabel("User ID: " .. Player.UserId)
 
 HomeTab:CreateSection("Community")
-local DiscordLink = "https://discord.gg/rielhub" -- YOUR LINK HERE
-HomeTab:CreateInput({
-    Name = "Discord Server",
-    PlaceholderText = DiscordLink,
-    RemoveTextAfterFocusLost = false,
-    Callback = function() end,
-})
+local DiscordLink = "https://discord.gg/rielhub"
+-- FIXED: Changed Input to Label so users cannot edit the link
+HomeTab:CreateLabel("Discord Server: " .. DiscordLink) 
 HomeTab:CreateButton({
    Name = "Copy Discord Link",
    Interact = 'Salin ke clipboard',
@@ -248,7 +244,7 @@ SettingsTab:CreateButton({Name = "Destroy UI", Callback = function() Rayfield:De
 
 Rayfield:Notify({
    Title = Player.DisplayName,
-   Content = "Riel Hub V3 Premium Loaded!",
+   Content = "Riel Hub V3 Premium Fixed!",
    Duration = 5,
    Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=150&h=150",
 })
