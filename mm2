@@ -12,55 +12,52 @@ local Window = Rayfield:CreateWindow({
    KeySystem = false, 
 })
 
--- [[ SIDEBAR TABS ]] --
+-- [[ SIDEBAR TABS WITH CORRECT ICONS ]] --
+local HomeTab = Window:CreateTab("Home", "home") 
+local MainTab = Window:CreateTab("Main", "code") 
+local TargetTab = Window:CreateTab("Target", "crosshair") 
+local TrollTab = Window:CreateTab("Troll", "smile") 
+local SpectateTab = Window:CreateTab("Spectate", "eye") 
+local AnimTab = Window:CreateTab("Anim", "user") 
+local EmotesTab = Window:CreateTab("Emotes", "gamepad-2") 
+local SettingsTab = Window:CreateTab("Settings", "settings") 
 
--- 1. Home
-local HomeTab = Window:CreateTab("Home", 4483362458) -- Home Icon
+-- [[ PLAYER PROFILE SECTION (Bottom Sidebar) ]] --
+local Player = game.Players.LocalPlayer
+local UserId = Player.UserId
+local DisplayName = Player.DisplayName
+local Username = Player.Name
 
--- 2. Main (The <> Code Icon)
-local MainTab = Window:CreateTab("Main", 4483345998) 
+-- This replicates the "6sixig" look at the bottom
+Rayfield:Notify({
+   Title = "User Authenticated",
+   Content = "Logged in as " .. DisplayName .. " (@" .. Username .. ")",
+   Duration = 5,
+   Image = "rbxthumb://type=AvatarHeadShot&id=" .. UserId .. "&w=150&h=150",
+})
 
--- 3. Target (The Crosshair Icon)
-local TargetTab = Window:CreateTab("Target", 4483362458) 
-
--- 4. Troll (The Smiley Face Icon - Your Screenshot)
-local TrollTab = Window:CreateTab("Troll", 4483345998) 
-
--- 5. Spectate (The Eye Icon)
-local SpectateTab = Window:CreateTab("Spectate", 4483345998) 
-
--- 6. Anim (The Person/Running Icon)
-local AnimTab = Window:CreateTab("Anim", 4483345998) 
-
--- 7. Emotes (The Controller/Gamepad Icon)
-local EmotesTab = Window:CreateTab("Emotes", 4483345998) 
-
--- 8. Settings (The Gear Icon)
-local SettingsTab = Window:CreateTab("Settings", 4483345998) 
-
--- [[ ADDING THE CONTENT TO THE TROLL TAB ]] --
--- This matches your screenshot exactly
+-- [[ TROLL TAB CONTENT ]] --
 local TrollSection = TrollTab:CreateSection("Actions")
 
 TrollTab:CreateInput({
    Name = "Troll Target Username",
    PlaceholderText = "Enter troll target...",
    Callback = function(Text)
-      print("Targeting: " .. Text)
+      _G.TargetName = Text
    end,
 })
 
 TrollTab:CreateButton({
    Name = "Void Target (Kill)",
    Callback = function()
-      print("Executing Void...")
+      print("Targeting: " .. (_G.TargetName or "None"))
    end,
 })
 
 TrollTab:CreateButton({
    Name = "Loop Fling Target",
    Callback = function()
-      print("Executing Fling...")
+      print("Flinging...")
    end,
 })
 
@@ -68,13 +65,12 @@ TrollTab:CreateToggle({
    Name = "Walk On Air (Smart)",
    CurrentValue = false,
    Callback = function(Value)
-      print("Walk on Air: ", Value)
+      _G.WalkOnAir = Value
+      -- Smart Walk on Air Logic
+      game:GetService("RunService").Stepped:Connect(function()
+         if _G.WalkOnAir and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+            Player.Character.HumanoidRootPart.Velocity = Vector3.new(Player.Character.HumanoidRootPart.Velocity.X, 0, Player.Character.HumanoidRootPart.Velocity.Z)
+         end
+      end)
    end,
-})
-
-Rayfield:Notify({
-   Title = "Riel Hub Loaded",
-   Content = "Welcome back, developer kitaroriel!",
-   Duration = 5,
-   Image = 4483345998,
 })
