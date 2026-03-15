@@ -9,52 +9,72 @@ local Window = Rayfield:CreateWindow({
       FolderName = "RielHub", 
       FileName = "Config"
    },
-   Discord = {
-      Enabled = false,
-   },
    KeySystem = false, 
 })
 
--- Creating the "Troll" Tab (Matching your image)
-local TrollTab = Window:CreateTab("Troll", 4483345998) -- Icon ID for the smiley face
+-- [[ SIDEBAR TABS ]] --
 
-local Section = TrollTab:CreateSection("Actions")
+-- 1. Home
+local HomeTab = Window:CreateTab("Home", 4483362458) -- Home Icon
 
--- 1. Troll Target Box
+-- 2. Main (The <> Code Icon)
+local MainTab = Window:CreateTab("Main", 4483345998) 
+
+-- 3. Target (The Crosshair Icon)
+local TargetTab = Window:CreateTab("Target", 4483362458) 
+
+-- 4. Troll (The Smiley Face Icon - Your Screenshot)
+local TrollTab = Window:CreateTab("Troll", 4483345998) 
+
+-- 5. Spectate (The Eye Icon)
+local SpectateTab = Window:CreateTab("Spectate", 4483345998) 
+
+-- 6. Anim (The Person/Running Icon)
+local AnimTab = Window:CreateTab("Anim", 4483345998) 
+
+-- 7. Emotes (The Controller/Gamepad Icon)
+local EmotesTab = Window:CreateTab("Emotes", 4483345998) 
+
+-- 8. Settings (The Gear Icon)
+local SettingsTab = Window:CreateTab("Settings", 4483345998) 
+
+-- [[ ADDING THE CONTENT TO THE TROLL TAB ]] --
+-- This matches your screenshot exactly
+local TrollSection = TrollTab:CreateSection("Actions")
+
 TrollTab:CreateInput({
    Name = "Troll Target Username",
    PlaceholderText = "Enter troll target...",
-   RemoveTextAfterFocusLost = false,
    Callback = function(Text)
-      print("Target set to: " .. Text)
+      print("Targeting: " .. Text)
    end,
 })
 
--- 2. Void Target Button
 TrollTab:CreateButton({
    Name = "Void Target (Kill)",
-   Interact = 'Click',
    Callback = function()
-      -- Logic would go here
-      print("Attempting to void target...")
+      print("Executing Void...")
    end,
 })
 
--- 3. Loop Fling Button
 TrollTab:CreateButton({
    Name = "Loop Fling Target",
-   Interact = 'Click',
    Callback = function()
-      print("Flinging target...")
+      print("Executing Fling...")
    end,
 })
 
--- 4. Walk On Air Toggle
 TrollTab:CreateToggle({
    Name = "Walk On Air (Smart)",
    CurrentValue = false,
-   Flag = "WalkAir", 
    Callback = function(Value)
-      print("Walk on Air is now: ", Value)
+      print("Walk on Air: ", Value)
    end,
+})
+
+Rayfield:Notify({
+   Title = "Riel Hub Loaded",
+   Content = "Welcome back, developer kitaroriel!",
+   Duration = 5,
+   Image = 4483345998,
 })
