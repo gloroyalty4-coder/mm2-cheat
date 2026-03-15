@@ -6,7 +6,15 @@ local Window = Rayfield:CreateWindow({
    LoadingSubtitle = "by kitaroriel",
    ConfigurationSaving = {Enabled = true, FolderName = "RielHub", FileName = "Config"},
    KeySystem = false,
-   Theme = "Coffee" -- This matches the dark reddish-brown theme in your image
+   -- CUSTOM THEME TO MATCH IMAGE EXACTLY
+   Theme = "BloodTheme", 
+   CustomTheme = {
+       ["BackgroundColor"] = Color3.fromRGB(20, 10, 10), -- Darker background
+       ["SidebarColor"] = Color3.fromRGB(35, 15, 15), -- Reddish sidebar
+       ["TextColor"] = Color3.fromRGB(255, 255, 255),
+       ["MainColor"] = Color3.fromRGB(150, 40, 40), -- Main Accent Red
+       ["AccentColor"] = Color3.fromRGB(180, 50, 50)
+   }
 })
 
 -- [[ GLOBAL VARIABLES & LOGIC ]] --
@@ -23,7 +31,7 @@ _G.JumpEnabled = false
 _G.JumpPower = 50
 _G.Noclip = false
 
--- Function: Find Player by Name/Display Name
+-- Function: Find Player
 local function GetPlayer(Name)
     Name = Name:lower()
     for _, v in pairs(game.Players:GetPlayers()) do
@@ -34,7 +42,7 @@ local function GetPlayer(Name)
     return nil
 end
 
--- Core Engine Loop (Speed, Jump, Noclip)
+-- Core Engine Loop
 RunService.Stepped:Connect(function()
     pcall(function()
         if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
@@ -59,12 +67,12 @@ SpectateGui.Name = "RielSpectateOverlay"
 SpectateGui.Enabled = false
 
 local Bar = Instance.new("Frame", SpectateGui)
-Bar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Bar.BackgroundColor3 = Color3.fromRGB(20, 10, 10)
 Bar.Position = UDim2.new(0.5, -150, 0.88, 0)
 Bar.Size = UDim2.new(0, 300, 0, 50)
 Instance.new("UICorner", Bar).CornerRadius = UDim.new(0, 8)
 local Stroke = Instance.new("UIStroke", Bar)
-Stroke.Color = Color3.fromRGB(139, 69, 19) 
+Stroke.Color = Color3.fromRGB(180, 40, 40)
 Stroke.Thickness = 2
 
 local function CreateSpecBtn(text, pos, color, func)
@@ -75,7 +83,7 @@ local function CreateSpecBtn(text, pos, color, func)
     b.Text = text
     b.TextColor3 = Color3.new(1,1,1)
     b.Font = Enum.Font.GothamBold
-    b.TextSize = 12
+    b.TextSize = 11
     Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
     b.MouseButton1Click:Connect(func)
 end
@@ -89,14 +97,14 @@ local function UpdateSpec(dir)
     if target and target.Character then Camera.CameraSubject = target.Character:FindFirstChildOfClass("Humanoid") end
 end
 
-CreateSpecBtn("< PREV", UDim2.new(0.03, 0, 0.12, 0), Color3.fromRGB(35, 35, 35), function() UpdateSpec(-1) end)
-CreateSpecBtn("CLOSE", UDim2.new(0.36, 0, 0.12, 0), Color3.fromRGB(139, 69, 19), function() 
+CreateSpecBtn("< PREV", UDim2.new(0.03, 0, 0.12, 0), Color3.fromRGB(40, 20, 20), function() UpdateSpec(-1) end)
+CreateSpecBtn("CLOSE", UDim2.new(0.36, 0, 0.12, 0), Color3.fromRGB(180, 40, 40), function() 
     SpectateGui.Enabled = false
     Camera.CameraSubject = Player.Character:FindFirstChildOfClass("Humanoid")
 end)
-CreateSpecBtn("NEXT >", UDim2.new(0.69, 0, 0.12, 0), Color3.fromRGB(35, 35, 35), function() UpdateSpec(1) end)
+CreateSpecBtn("NEXT >", UDim2.new(0.69, 0, 0.12, 0), Color3.fromRGB(40, 20, 20), function() UpdateSpec(1) end)
 
--- [[ TAB INITIALIZATION - MATCHING YOUR IMAGE ]] --
+-- [[ TAB INITIALIZATION ]] --
 local HomeTab = Window:CreateTab("Home", "home")
 local MainTab = Window:CreateTab("Main", "code")
 local TargetTab = Window:CreateTab("Target", "crosshair")
@@ -105,7 +113,7 @@ local SpectateTab = Window:CreateTab("Spectate", "eye")
 local AnimTab = Window:CreateTab("Anim", "user")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
--- [[ HOME - EXACT MATCH TO IMAGE LAYOUT ]] --
+-- [[ HOME - EXACT SCREENSHOT REPLICA ]] --
 HomeTab:CreateSection("Account Info")
 
 HomeTab:CreateButton({
@@ -113,8 +121,8 @@ HomeTab:CreateButton({
    Interact = 'Username: ' .. Player.Name,
    Callback = function()
        Rayfield:Notify({
-           Title = "User Card",
-           Content = "Name: " .. Player.Name .. "\nID: " .. Player.UserId,
+           Title = "User Account",
+           Content = "Display: " .. Player.DisplayName .. "\nID: " .. Player.UserId,
            Duration = 5
        })
    end,
@@ -122,7 +130,7 @@ HomeTab:CreateButton({
 
 HomeTab:CreateButton({
    Name = "Rejoin Server",
-   Interact = 'Refresh koneksi server', -- Matching the Indonesian subtitle in image
+   Interact = 'Refresh koneksi server', -- Indonesian text from image
    Callback = function() TeleportService:Teleport(game.PlaceId, Player) end,
 })
 
@@ -131,18 +139,10 @@ local DiscordLink = "https://discord.gg/H6ccmTMd7T"
 HomeTab:CreateLabel("Discord Server: " .. DiscordLink) 
 HomeTab:CreateButton({
    Name = "Copy Discord Link",
-   Interact = 'Salin ke clipboard',
-   Callback = function()
-       setclipboard(DiscordLink)
-       Rayfield:Notify({
-           Title = "Copied!",
-           Content = "Discord link copied to clipboard.",
-           Duration = 3,
-       })
-   end,
+   Callback = function() setclipboard(DiscordLink) end,
 })
 
--- [[ MAIN - MOVEMENT ]] --
+-- [[ MAIN ]] --
 MainTab:CreateSection("Movement")
 MainTab:CreateToggle({Name = "Enable Speed", CurrentValue = false, Callback = function(V) _G.SpeedEnabled = V end})
 MainTab:CreateSlider({Name = "WalkSpeed Value", Range = {16, 300}, Increment = 1, CurrentValue = 16, Callback = function(V) _G.WalkSpeed = V end})
@@ -194,16 +194,6 @@ SpectateTab:CreateToggle({
        if not V then Camera.CameraSubject = Player.Character:FindFirstChildOfClass("Humanoid") end 
    end,
 })
-
--- [[ ANIMATIONS ]] --
-AnimTab:CreateSection("Animation Packs")
-AnimTab:CreateDropdown({
-   Name = "Select Animation Pack",
-   Options = {"Original", "Old School", "Mage", "Ninja", "Zombie", "Knight"},
-   CurrentOption = {"Original"},
-   Callback = function(Option) end,
-})
-AnimTab:CreateButton({Name = "Reset Character", Callback = function() Player.Character:BreakJoints() end})
 
 -- [[ SETTINGS ]] --
 SettingsTab:CreateSection("Menu Config")
