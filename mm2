@@ -6,7 +6,7 @@ local Window = Rayfield:CreateWindow({
    LoadingSubtitle = "by kitaroriel",
    ConfigurationSaving = {Enabled = true, FolderName = "RielHub", FileName = "Config"},
    KeySystem = false,
-   Theme = "BloodTheme" -- Sets the dark burgundy theme from your image
+   Theme = "Coffee" -- This matches the dark reddish-brown theme in your image
 })
 
 -- [[ GLOBAL VARIABLES & LOGIC ]] --
@@ -64,7 +64,7 @@ Bar.Position = UDim2.new(0.5, -150, 0.88, 0)
 Bar.Size = UDim2.new(0, 300, 0, 50)
 Instance.new("UICorner", Bar).CornerRadius = UDim.new(0, 8)
 local Stroke = Instance.new("UIStroke", Bar)
-Stroke.Color = Color3.fromRGB(180, 40, 40) -- Themed red to match UI
+Stroke.Color = Color3.fromRGB(139, 69, 19) 
 Stroke.Thickness = 2
 
 local function CreateSpecBtn(text, pos, color, func)
@@ -90,13 +90,13 @@ local function UpdateSpec(dir)
 end
 
 CreateSpecBtn("< PREV", UDim2.new(0.03, 0, 0.12, 0), Color3.fromRGB(35, 35, 35), function() UpdateSpec(-1) end)
-CreateSpecBtn("CLOSE", UDim2.new(0.36, 0, 0.12, 0), Color3.fromRGB(180, 40, 40), function() 
+CreateSpecBtn("CLOSE", UDim2.new(0.36, 0, 0.12, 0), Color3.fromRGB(139, 69, 19), function() 
     SpectateGui.Enabled = false
     Camera.CameraSubject = Player.Character:FindFirstChildOfClass("Humanoid")
 end)
 CreateSpecBtn("NEXT >", UDim2.new(0.69, 0, 0.12, 0), Color3.fromRGB(35, 35, 35), function() UpdateSpec(1) end)
 
--- [[ TAB INITIALIZATION - ORDERED TO MATCH IMAGE ]] --
+-- [[ TAB INITIALIZATION - MATCHING YOUR IMAGE ]] --
 local HomeTab = Window:CreateTab("Home", "home")
 local MainTab = Window:CreateTab("Main", "code")
 local TargetTab = Window:CreateTab("Target", "crosshair")
@@ -105,7 +105,7 @@ local SpectateTab = Window:CreateTab("Spectate", "eye")
 local AnimTab = Window:CreateTab("Anim", "user")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
--- [[ HOME - REPLICATING THE CENTER LAYOUT OF YOUR IMAGE ]] --
+-- [[ HOME - EXACT MATCH TO IMAGE LAYOUT ]] --
 HomeTab:CreateSection("Account Info")
 
 HomeTab:CreateButton({
@@ -113,8 +113,8 @@ HomeTab:CreateButton({
    Interact = 'Username: ' .. Player.Name,
    Callback = function()
        Rayfield:Notify({
-           Title = "User Information",
-           Content = "Display: " .. Player.DisplayName .. "\nID: " .. Player.UserId,
+           Title = "User Card",
+           Content = "Name: " .. Player.Name .. "\nID: " .. Player.UserId,
            Duration = 5
        })
    end,
@@ -122,7 +122,7 @@ HomeTab:CreateButton({
 
 HomeTab:CreateButton({
    Name = "Rejoin Server",
-   Interact = 'Refresh koneksi server', -- Matching the text in your image
+   Interact = 'Refresh koneksi server', -- Matching the Indonesian subtitle in image
    Callback = function() TeleportService:Teleport(game.PlaceId, Player) end,
 })
 
@@ -138,63 +138,34 @@ HomeTab:CreateButton({
            Title = "Copied!",
            Content = "Discord link copied to clipboard.",
            Duration = 3,
-           Image = 4483362458
        })
    end,
 })
 
 -- [[ MAIN - MOVEMENT ]] --
 MainTab:CreateSection("Movement")
-MainTab:CreateToggle({
-    Name = "Enable Speed",
-    CurrentValue = false,
-    Callback = function(V) _G.SpeedEnabled = V end,
-})
-MainTab:CreateSlider({
-    Name = "WalkSpeed Value",
-    Range = {16, 300},
-    Increment = 1,
-    CurrentValue = 16,
-    Callback = function(V) _G.WalkSpeed = V end,
-})
-MainTab:CreateToggle({
-    Name = "Enable Jump Power",
-    CurrentValue = false,
-    Callback = function(V) _G.JumpEnabled = V end,
-})
-MainTab:CreateSlider({
-    Name = "JumpPower Value",
-    Range = {50, 500},
-    Increment = 1,
-    CurrentValue = 50,
-    Callback = function(V) _G.JumpPower = V end,
-})
-
+MainTab:CreateToggle({Name = "Enable Speed", CurrentValue = false, Callback = function(V) _G.SpeedEnabled = V end})
+MainTab:CreateSlider({Name = "WalkSpeed Value", Range = {16, 300}, Increment = 1, CurrentValue = 16, Callback = function(V) _G.WalkSpeed = V end})
+MainTab:CreateToggle({Name = "Enable Jump Power", CurrentValue = false, Callback = function(V) _G.JumpEnabled = V end})
+MainTab:CreateSlider({Name = "JumpPower Value", Range = {50, 500}, Increment = 1, CurrentValue = 50, Callback = function(V) _G.JumpPower = V end})
 MainTab:CreateSection("Utility")
 MainTab:CreateToggle({Name = "Noclip", CurrentValue = false, Callback = function(V) _G.Noclip = V end})
 
--- [[ TARGET - SELECTION & TELEPORT ]] --
+-- [[ TARGET ]] --
 TargetTab:CreateSection("Target Selection")
-TargetTab:CreateInput({
-    Name = "Target Username",
-    PlaceholderText = "Enter name...",
-    Callback = function(T) _G.TargetName = T end,
-})
+TargetTab:CreateInput({Name = "Target Username", PlaceholderText = "Enter name...", Callback = function(T) _G.TargetName = T end})
 TargetTab:CreateButton({
     Name = "Teleport to Target", 
     Callback = function()
         local t = GetPlayer(_G.TargetName)
-        if t and t.Character then 
-            Player.Character.HumanoidRootPart.CFrame = t.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3)
-        end
+        if t and t.Character then Player.Character.HumanoidRootPart.CFrame = t.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3) end
     end
 })
-
 TargetTab:CreateSection("Carry & Sit")
 TargetTab:CreateToggle({Name = "Backpack (Sit on Back)", CurrentValue = false, Callback = function(V) end})
 TargetTab:CreateToggle({Name = "Sit on Head", CurrentValue = false, Callback = function(V) end})
 
--- [[ TROLL - ACTIONS ]] --
+-- [[ TROLL ]] --
 TrollTab:CreateSection("Troll Actions")
 TrollTab:CreateInput({Name = "Troll Target", PlaceholderText = "Enter target...", Callback = function(T) _G.TrollTarget = T end})
 TrollTab:CreateButton({
@@ -203,9 +174,8 @@ TrollTab:CreateButton({
         local t = GetPlayer(_G.TrollTarget)
         if t and t.Character then
             local hrp = Player.Character.HumanoidRootPart
-            local thrp = t.Character.HumanoidRootPart
             local oldPos = hrp.CFrame
-            hrp.CFrame = thrp.CFrame
+            hrp.CFrame = t.Character.HumanoidRootPart.CFrame
             hrp.Velocity = Vector3.new(999999, 999999, 999999)
             task.wait(0.2)
             hrp.Velocity = Vector3.new(0,0,0)
@@ -213,7 +183,6 @@ TrollTab:CreateButton({
         end
     end
 })
-TrollTab:CreateToggle({Name = "Walk On Air", CurrentValue = false, Callback = function(V) end})
 
 -- [[ SPECTATE ]] --
 SpectateTab:CreateSection("Spectator Mode")
@@ -236,17 +205,7 @@ AnimTab:CreateDropdown({
 })
 AnimTab:CreateButton({Name = "Reset Character", Callback = function() Player.Character:BreakJoints() end})
 
--- [[ SETTINGS - LIVE THEME UPDATER ]] --
-SettingsTab:CreateSection("Interface Theme")
-SettingsTab:CreateDropdown({
-   Name = "Change Theme",
-   Options = {"Default", "AmberGlow", "GreenLight", "Ocean", "Serenity", "BloodTheme"},
-   CurrentOption = {"BloodTheme"},
-   Callback = function(Option) 
-       Window:SetTheme(Option[1])
-   end,
-})
-
+-- [[ SETTINGS ]] --
 SettingsTab:CreateSection("Menu Config")
 SettingsTab:CreateButton({Name = "Destroy UI", Callback = function() Rayfield:Destroy() end})
 
