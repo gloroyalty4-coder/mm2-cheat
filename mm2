@@ -168,7 +168,6 @@ local MainTab = Window:CreateTab("Main","code")
 local TargetTab = Window:CreateTab("Target","crosshair")
 local TrollTab = Window:CreateTab("Troll","smile")
 local SpectateTab = Window:CreateTab("Spectate","eye")
-local AnimTab = Window:CreateTab("Anim","user")
 local SettingsTab = Window:CreateTab("Settings","settings")
 
 -- HOME
@@ -309,7 +308,7 @@ TrollTab:CreateButton({
 Name="Fling Target",
 Callback=function()
 
-local t=GetPlayer(_G.TrollTarget)
+local t = GetPlayer(_G.TrollTarget)
 
 if t and t.Character then
 
@@ -317,13 +316,18 @@ local hrp = Character.HumanoidRootPart
 local thrp = t.Character.HumanoidRootPart
 local old = hrp.CFrame
 
-for i=1,20 do
-hrp.CFrame = thrp.CFrame * CFrame.new(0,0,-2)
-hrp.Velocity = Vector3.new(60000,60000,60000)
+local spin = Instance.new("BodyAngularVelocity")
+spin.AngularVelocity = Vector3.new(0,999999,0)
+spin.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+spin.P = math.huge
+spin.Parent = hrp
+
+for i=1,30 do
+hrp.CFrame = thrp.CFrame * CFrame.new(0,0,-1)
 RunService.Heartbeat:Wait()
 end
 
-hrp.Velocity = Vector3.new()
+spin:Destroy()
 hrp.CFrame = old
 
 end
@@ -345,14 +349,6 @@ if not v then
 Camera.CameraSubject=Character:FindFirstChildOfClass("Humanoid")
 end
 
-end
-})
-
--- ANIM
-AnimTab:CreateButton({
-Name="Reset Character",
-Callback=function()
-Character:BreakJoints()
 end
 })
 
