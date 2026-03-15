@@ -9,16 +9,50 @@ local Window = Rayfield:CreateWindow({
       FolderName = "RielHub", 
       FileName = "Config"
    },
-   Discord = {
-      Enabled = false,
-      Invite = "noinvite", 
-      RememberJoins = true 
-   },
    KeySystem = false,
 })
 
+-- [[ GLOBAL VARIABLES ]] --
+local Player = game.Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
+
+_G.SpeedEnabled = false
+_G.WalkSpeed = 16
+_G.JumpEnabled = false
+_G.JumpPower = 50
+_G.Noclip = false
+_G.FlyEnabled = false
+_G.FlySpeed = 50
+
+-- [[ CORE LOGIC LOOPS ]] --
+
+-- Noclip & Speed/Jump Persistence
+RunService.Stepped:Connect(function()
+    if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
+        local Hum = Player.Character:FindFirstChildOfClass("Humanoid")
+        
+        -- Speed Logic
+        if _G.SpeedEnabled then
+            Hum.WalkSpeed = _G.WalkSpeed
+        end
+        
+        -- Jump Logic
+        if _G.JumpEnabled then
+            Hum.UseJumpPower = true
+            Hum.JumpPower = _G.JumpPower
+        end
+
+        -- Noclip Logic
+        if _G.Noclip then
+            for _, v in pairs(Player.Character:GetDescendants()) do
+                if v:IsA("BasePart") then v.CanCollide = false end
+            end
+        end
+    end
+end)
+
 -- [[ SIDEBAR TABS SETUP ]] --
--- These are created in the exact order of your sidebar image
 local HomeTab = Window:CreateTab("Home", "home") 
 local MainTab = Window:CreateTab("Main", "code")
 local TargetTab = Window:CreateTab("Target", "crosshair")
@@ -29,7 +63,6 @@ local EmotesTab = Window:CreateTab("Emotes", "gamepad-2")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
 -- [[ HOME TAB CONTENT ]] --
--- This replicates the "Account Info" image 1:1
 local HomeSection = HomeTab:CreateSection("Account Info")
 
 HomeTab:CreateLabel("User Information")
@@ -38,14 +71,85 @@ HomeTab:CreateButton({
    Name = "Rejoin Server",
    Interact = 'Refresh koneksi server',
    Callback = function()
-      local ts = game:GetService("TeleportService")
-      local p = game.Players.LocalPlayer
-      ts:Teleport(game.PlaceId, p)
+      TeleportService:Teleport(game.PlaceId, Player)
+   end,
+})
+
+-- [[ MAIN TAB CONTENT (MOVEMENT & UTILITY) ]] --
+local MovementSection = MainTab:CreateSection("Movement")
+
+MainTab:CreateToggle({
+   Name = "Enable Speed",
+   CurrentValue = false,
+   Interact = 'Aktifkan kecepatan lari',
+   Callback = function(Value)
+      _G.SpeedEnabled = Value
+   end,
+})
+
+MainTab:CreateSlider({
+   Name = "WalkSpeed Value",
+   Range = {16, 300},
+   Increment = 1,
+   Suffix = " Speed",
+   CurrentValue = 16,
+   Callback = function(Value)
+      _G.WalkSpeed = Value
+   end,
+})
+
+MainTab:CreateToggle({
+   Name = "Enable Jump Power",
+   CurrentValue = false,
+   Interact = 'Aktifkan kekuatan lompat',
+   Callback = function(Value)
+      _G.JumpEnabled = Value
+   end,
+})
+
+MainTab:CreateSlider({
+   Name = "JumpPower Value",
+   Range = {50, 500},
+   Increment = 1,
+   Suffix = " Power",
+   CurrentValue = 50,
+   Callback = function(Value)
+      _G.JumpPower = Value
+   end,
+})
+
+local UtilitySection = MainTab:CreateSection("Utility")
+
+MainTab:CreateToggle({
+   Name = "Noclip",
+   CurrentValue = false,
+   Interact = 'Tembus tembok',
+   Callback = function(Value)
+      _G.Noclip = Value
+   end,
+})
+
+MainTab:CreateToggle({
+   Name = "Fly Mode (Auraverse)",
+   CurrentValue = false,
+   Interact = 'Terbang dengan gaya Auraverse',
+   Callback = function(Value)
+      _G.FlyEnabled = Value
+      -- Fly logic implementation would go here
+   end,
+})
+
+MainTab:CreateSlider({
+   Name = "Fly Speed",
+   Range = {1, 500},
+   Increment = 1,
+   CurrentValue = 50,
+   Callback = function(Value)
+      _G.FlySpeed = Value
    end,
 })
 
 -- [[ TROLL TAB CONTENT ]] --
--- This replicates the "Actions" image 1:1
 local TrollSection = TrollTab:CreateSection("Actions")
 
 TrollTab:CreateInput({
@@ -60,48 +164,27 @@ TrollTab:CreateInput({
 TrollTab:CreateButton({
    Name = "Void Target (Kill)",
    Callback = function()
-      print("Targeting " .. tostring(_G.TargetName) .. " for Void.")
+      print("Voiding " .. tostring(_G.TargetName))
    end,
 })
 
 TrollTab:CreateButton({
    Name = "Loop Fling Target",
    Callback = function()
-      print("Targeting " .. tostring(_G.TargetName) .. " for Fling.")
+      print("Flinging " .. tostring(_G.TargetName))
    end,
 })
 
 TrollTab:CreateToggle({
    Name = "Walk On Air (Smart)",
    CurrentValue = false,
-   Flag = "WalkAirToggle",
    Callback = function(Value)
-      _G.WalkOnAir = Value
-      -- Logic to prevent falling
-      game:GetService("RunService").Stepped:Connect(function()
-         if _G.WalkOnAir then
-            local char = game.Players.LocalPlayer.Character
-            if char and char:FindFirstChild("HumanoidRootPart") then
-               char.HumanoidRootPart.Velocity = Vector3.new(char.HumanoidRootPart.Velocity.X, 0, char.HumanoidRootPart.Velocity.Z)
-            end
-         end
-      end)
+       _G.WalkOnAir = Value
+       -- Logic for airwalking
    end,
 })
 
--- [[ SETTINGS TAB CONTENT ]] --
-local SettingsSection = SettingsTab:CreateSection("Menu Settings")
-
-SettingsTab:CreateButton({
-   Name = "Destroy UI",
-   Callback = function()
-      Rayfield:Destroy()
-   end,
-})
-
--- [[ PROFILE NOTIFICATION ]] --
--- This mimics the profile info (6sixig) shown at the bottom of your image
-local Player = game.Players.LocalPlayer
+-- [[ INITIALIZATION NOTIFICATION ]] --
 Rayfield:Notify({
    Title = "Riel Hub: " .. Player.DisplayName,
    Content = "Logged in as @" .. Player.Name,
@@ -109,4 +192,4 @@ Rayfield:Notify({
    Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=150&h=150",
 })
 
-print("Riel Hub fully loaded.")
+print("Riel Hub successfully initialized.")
