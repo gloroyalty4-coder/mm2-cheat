@@ -104,11 +104,35 @@ local SpectateTab = Window:CreateTab("Spectate", "eye")
 local AnimTab = Window:CreateTab("Anim", "user")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
--- [[ HOME - REAL ACCOUNT DATA ]] --
+-- [[ HOME - REAL ACCOUNT DATA & DISCORD ]] --
 HomeTab:CreateSection("Account Info")
 HomeTab:CreateLabel("Username: " .. Player.Name)
 HomeTab:CreateLabel("Display: " .. Player.DisplayName)
 HomeTab:CreateLabel("User ID: " .. Player.UserId)
+
+HomeTab:CreateSection("Community")
+local DiscordLink = "https://discord.gg/rielhub" -- YOUR LINK HERE
+HomeTab:CreateInput({
+    Name = "Discord Server",
+    PlaceholderText = DiscordLink,
+    RemoveTextAfterFocusLost = false,
+    Callback = function() end,
+})
+HomeTab:CreateButton({
+   Name = "Copy Discord Link",
+   Interact = 'Salin ke clipboard',
+   Callback = function()
+       setclipboard(DiscordLink)
+       Rayfield:Notify({
+           Title = "Copied!",
+           Content = "Discord link copied to clipboard.",
+           Duration = 3,
+           Image = 4483362458
+       })
+   end,
+})
+
+HomeTab:CreateSection("Server")
 HomeTab:CreateButton({
    Name = "Rejoin Server",
    Interact = 'Refresh koneksi server',
