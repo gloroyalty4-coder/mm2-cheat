@@ -1,108 +1,60 @@
--- [[ RIEL HUB REPLICA UI ]] --
-local ScreenGui = Instance.new("ScreenGui")
-local Main = Instance.new("Frame")
-local Sidebar = Instance.new("Frame")
-local Content = Instance.new("ScrollingFrame")
-local Title = Instance.new("TextLabel")
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- Set up ScreenGui
-ScreenGui.Name = "RielHubReplica"
-ScreenGui.Parent = game.CoreGui
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local Window = Rayfield:CreateWindow({
+   Name = "Riel Hub | Developer kitaroriel",
+   LoadingTitle = "Riel Hub",
+   LoadingSubtitle = "by kitaroriel",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "RielHub", 
+      FileName = "Config"
+   },
+   Discord = {
+      Enabled = false,
+   },
+   KeySystem = false, 
+})
 
--- Main Window
-Main.Name = "Main"
-Main.Parent = ScreenGui
-Main.BackgroundColor3 = Color3.fromRGB(35, 20, 20) -- Dark Red/Brown tint
-Main.Position = UDim2.new(0.5, -275, 0.5, -175)
-Main.Size = UDim2.new(0, 550, 0, 380)
-Main.BorderSizePixel = 0
-Main.ClipsDescendants = true
+-- Creating the "Troll" Tab (Matching your image)
+local TrollTab = Window:CreateTab("Troll", 4483345998) -- Icon ID for the smiley face
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 12)
-MainCorner.Parent = Main
+local Section = TrollTab:CreateSection("Actions")
 
--- Sidebar Setup
-Sidebar.Name = "Sidebar"
-Sidebar.Parent = Main
-Sidebar.BackgroundColor3 = Color3.fromRGB(25, 15, 15)
-Sidebar.Size = UDim2.new(0, 160, 1, 0)
-Sidebar.BorderSizePixel = 0
+-- 1. Troll Target Box
+TrollTab:CreateInput({
+   Name = "Troll Target Username",
+   PlaceholderText = "Enter troll target...",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+      print("Target set to: " .. Text)
+   end,
+})
 
-local SidebarCorner = Instance.new("UICorner")
-SidebarCorner.CornerRadius = UDim.new(0, 12)
-SidebarCorner.Parent = Sidebar
+-- 2. Void Target Button
+TrollTab:CreateButton({
+   Name = "Void Target (Kill)",
+   Interact = 'Click',
+   Callback = function()
+      -- Logic would go here
+      print("Attempting to void target...")
+   end,
+})
 
--- Title Text
-Title.Parent = Sidebar
-Title.Text = "Riel Hub"
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.TextSize = 20
-Title.Font = Enum.Font.GothamBold
-Title.Position = UDim2.new(0.1, 0, 0.05, 0)
-Title.Size = UDim2.new(0.8, 0, 0.05, 0)
-Title.TextXAlignment = Enum.TextXAlignment.Left
+-- 3. Loop Fling Button
+TrollTab:CreateButton({
+   Name = "Loop Fling Target",
+   Interact = 'Click',
+   Callback = function()
+      print("Flinging target...")
+   end,
+})
 
--- Content Area (Actions)
-Content.Name = "Content"
-Content.Parent = Main
-Content.Position = UDim2.new(0.3, 10, 0.15, 0)
-Content.Size = UDim2.new(0.65, 0, 0.8, 0)
-Content.BackgroundTransparency = 1
-Content.CanvasSize = UDim2.new(0, 0, 1.5, 0)
-Content.ScrollBarThickness = 0
-
-local Layout = Instance.new("UIListLayout")
-Layout.Parent = Content
-Layout.Padding = UDim.new(0, 10)
-
--- Function to create a "Card" (Like the ones in your image)
-local function CreateCard(name, desc, hasToggle)
-    local Card = Instance.new("Frame")
-    Card.Size = UDim2.new(1, 0, 0, 80)
-    Card.BackgroundColor3 = Color3.fromRGB(50, 30, 30)
-    Card.Parent = Content
-    
-    local CardCorner = Instance.new("UICorner")
-    CardCorner.CornerRadius = UDim.new(0, 10)
-    CardCorner.Parent = Card
-    
-    local T = Instance.new("TextLabel")
-    T.Text = name
-    T.Size = UDim2.new(0.7, 0, 0.4, 0)
-    T.Position = UDim2.new(0.05, 0, 0.15, 0)
-    T.BackgroundTransparency = 1
-    T.TextColor3 = Color3.new(1,1,1)
-    T.Font = Enum.Font.GothamBold
-    T.TextXAlignment = "Left"
-    T.Parent = Card
-    
-    local D = Instance.new("TextLabel")
-    D.Text = desc
-    D.Size = UDim2.new(0.7, 0, 0.3, 0)
-    D.Position = UDim2.new(0.05, 0, 0.55, 0)
-    D.BackgroundTransparency = 1
-    D.TextColor3 = Color3.fromRGB(200, 200, 200)
-    D.Font = Enum.Font.Gotham
-    D.TextXAlignment = "Left"
-    D.Parent = Card
-
-    if hasToggle then
-        local Toggle = Instance.new("TextButton")
-        Toggle.Size = UDim2.new(0, 40, 0, 20)
-        Toggle.Position = UDim2.new(0.85, -20, 0.4, 0)
-        Toggle.BackgroundColor3 = Color3.new(1,1,1)
-        Toggle.Text = ""
-        Toggle.Parent = Card
-        Instance.new("UICorner", Toggle).CornerRadius = UDim.new(1, 0)
-    end
-end
-
--- Replicate the items from your screenshot
-CreateCard("Troll Target", "Masukkan target khusus untuk fitur Troll", false)
-CreateCard("Void Target (Kill)", "Teleport target troll ke void", false)
-CreateCard("Loop Fling Target", "Fling target troll berulang kali", false)
-CreateCard("Walk On Air (Smart)", "Lantai muncul otomatis (Mati saat Backpack)", true)
-
-print("UI Loaded. Use 'Main.Draggable = true' to move it.")
+-- 4. Walk On Air Toggle
+TrollTab:CreateToggle({
+   Name = "Walk On Air (Smart)",
+   CurrentValue = false,
+   Flag = "WalkAir", 
+   Callback = function(Value)
+      print("Walk on Air is now: ", Value)
+   end,
+})
