@@ -4,12 +4,9 @@ local Window = Rayfield:CreateWindow({
    Name = "Riel Hub | Developer kitaroriel",
    LoadingTitle = "Riel Hub┃Free",
    LoadingSubtitle = "by kitaroriel",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "RielHub",
-      FileName = "Config"
-   },
-   KeySystem = false
+   ConfigurationSaving = {Enabled = true, FolderName = "RielHub", FileName = "Config"},
+   KeySystem = false,
+   Theme = "BloodTheme"
 })
 
 -- SERVICES
@@ -33,7 +30,6 @@ _G.Backpack = false
 
 -- CHARACTER
 local Character = Player.Character or Player.CharacterAdded:Wait()
-
 Player.CharacterAdded:Connect(function(c)
 Character = c
 end)
@@ -41,7 +37,6 @@ end)
 -- FIND PLAYER
 local function GetPlayer(Name)
 Name = Name:lower()
-
 for _,v in pairs(Players:GetPlayers()) do
 if v.Name:lower():sub(1,#Name) == Name or v.DisplayName:lower():sub(1,#Name) == Name then
 return v
@@ -173,6 +168,7 @@ local MainTab = Window:CreateTab("Main","code")
 local TargetTab = Window:CreateTab("Target","crosshair")
 local TrollTab = Window:CreateTab("Troll","smile")
 local SpectateTab = Window:CreateTab("Spectate","eye")
+local AnimTab = Window:CreateTab("Anim","user")
 local SettingsTab = Window:CreateTab("Settings","settings")
 
 -- HOME
@@ -180,6 +176,7 @@ HomeTab:CreateSection("Account Info")
 
 HomeTab:CreateButton({
 Name="User Information",
+Interact='Username: '..Player.Name,
 Callback=function()
 
 Rayfield:Notify({
@@ -193,6 +190,7 @@ end
 
 HomeTab:CreateButton({
 Name="Rejoin Server",
+Interact="Refresh koneksi server",
 Callback=function()
 TeleportService:Teleport(game.PlaceId,Player)
 end
@@ -308,7 +306,7 @@ end
 })
 
 TrollTab:CreateButton({
-Name="AC Fling Target",
+Name="Fling Target",
 Callback=function()
 
 local t=GetPlayer(_G.TrollTarget)
@@ -317,24 +315,19 @@ if t and t.Character then
 
 local hrp = Character.HumanoidRootPart
 local thrp = t.Character.HumanoidRootPart
-
-local spin = Instance.new("BodyAngularVelocity")
-spin.AngularVelocity = Vector3.new(0,999999,0)
-spin.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
-spin.P = math.huge
-spin.Parent = hrp
-
 local old = hrp.CFrame
 
-for i=1,30 do
-hrp.CFrame = thrp.CFrame * CFrame.new(0,0,-1)
+for i=1,20 do
+hrp.CFrame = thrp.CFrame * CFrame.new(0,0,-2)
+hrp.Velocity = Vector3.new(60000,60000,60000)
 RunService.Heartbeat:Wait()
 end
 
-spin:Destroy()
+hrp.Velocity = Vector3.new()
 hrp.CFrame = old
 
 end
+
 end
 })
 
@@ -355,13 +348,21 @@ end
 end
 })
 
+-- ANIM
+AnimTab:CreateButton({
+Name="Reset Character",
+Callback=function()
+Character:BreakJoints()
+end
+})
+
 -- SETTINGS
 SettingsTab:CreateDropdown({
 Name="Change Theme",
 Options={"Default","AmberGlow","GreenLight","Ocean","Serenity","BloodTheme"},
-CurrentOption={"Default"},
+CurrentOption={"BloodTheme"},
 Callback=function(opt)
-Rayfield:SetTheme(opt[1])
+Window:SetTheme(opt[1])
 end
 })
 
