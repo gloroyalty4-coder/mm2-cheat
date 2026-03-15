@@ -6,7 +6,7 @@ local Window = Rayfield:CreateWindow({
    LoadingSubtitle = "by kitaroriel",
    ConfigurationSaving = {Enabled = true, FolderName = "RielHub", FileName = "Config"},
    KeySystem = false,
-   Theme = "Default" -- Image 2 uses the Default Rayfield top-bar theme
+   Theme = "BloodTheme" -- Matches the dark burgundy/red aesthetic
 })
 
 -- [[ GLOBAL VARIABLES & LOGIC ]] --
@@ -34,7 +34,7 @@ local function GetPlayer(Name)
     return nil
 end
 
--- Core Engine Loop (Speed, Jump, Noclip)
+-- Core Engine Loop
 RunService.Stepped:Connect(function()
     pcall(function()
         if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
@@ -53,23 +53,23 @@ RunService.Stepped:Connect(function()
     end)
 end)
 
--- [[ TOP TAB INITIALIZATION (MATCHING IMAGE 2) ]] --
-local HomeTab = Window:CreateTab("Home", "home") --
-local MainTab = Window:CreateTab("Main", "terminal") --
-local TargetTab = Window:CreateTab("Target", "target") --
-local TrollTab = Window:CreateTab("Troll", "smile") --
-local SpectateTab = Window:CreateTab("Spectate", "eye") --
+-- [[ TABS - CONFIGURED FOR TOP BAR NAVIGATION ]] --
+local HomeTab = Window:CreateTab("Home", "home")
+local MainTab = Window:CreateTab("Main", "code")
+local TargetTab = Window:CreateTab("Target", "crosshair")
+local TrollTab = Window:CreateTab("Troll", "smile")
+local SpectateTab = Window:CreateTab("Spectate", "eye")
 
--- [[ HOME - ACCOUNT INFO SECTION ]] --
-HomeTab:CreateSection("Account Info") --
+-- [[ HOME TAB - EXACT MATCH TO IMAGE LAYOUT ]] --
+HomeTab:CreateSection("Account Info")
 
 HomeTab:CreateButton({
    Name = "User Information",
-   Interact = "button", --
+   Interact = "button", -- Displays 'button' on the right side as seen in image
    Callback = function()
        Rayfield:Notify({
-           Title = "User Stats",
-           Content = "Username: "..Player.Name.."\nID: "..Player.UserId,
+           Title = "User Account",
+           Content = "Username: " .. Player.Name .. "\nID: " .. Player.UserId,
            Duration = 5
        })
    end,
@@ -77,33 +77,33 @@ HomeTab:CreateButton({
 
 HomeTab:CreateButton({
    Name = "Rejoin Server",
-   Interact = "button", --
+   Interact = "button",
    Callback = function() TeleportService:Teleport(game.PlaceId, Player) end,
 })
 
--- [[ HOME - COMMUNITY SECTION ]] --
-HomeTab:CreateSection("Community") --
+HomeTab:CreateSection("Community")
 
-HomeTab:CreateLabel("Discord Server: https://discord.gg/H6ccmTMd7T") --
+HomeTab:CreateLabel("Discord Server: https://discord.gg/H6ccmTMd7T")
 
 HomeTab:CreateButton({
    Name = "Copy Discord Link",
-   Interact = "button", --
-   Callback = function()
-       setclipboard("https://discord.gg/H6ccmTMd7T")
-       Rayfield:Notify({Title = "Copied", Content = "Link copied to clipboard", Duration = 3})
+   Interact = "button",
+   Callback = function() 
+       setclipboard("https://discord.gg/H6ccmTMd7T") 
+       Rayfield:Notify({Title = "Success", Content = "Link copied to clipboard!", Duration = 3})
    end,
 })
 
--- [[ MAIN - MOVEMENT ]] --
+-- [[ MAIN TAB ]] --
 MainTab:CreateSection("Movement")
 MainTab:CreateToggle({Name = "Enable Speed", CurrentValue = false, Callback = function(V) _G.SpeedEnabled = V end})
 MainTab:CreateSlider({Name = "WalkSpeed", Range = {16, 300}, Increment = 1, CurrentValue = 16, Callback = function(V) _G.WalkSpeed = V end})
-MainTab:CreateToggle({Name = "Enable Jump", CurrentValue = false, Callback = function(V) _G.JumpEnabled = V end})
+MainTab:CreateToggle({Name = "Enable Jump Power", CurrentValue = false, Callback = function(V) _G.JumpEnabled = V end})
+
 MainTab:CreateSection("Utility")
 MainTab:CreateToggle({Name = "Noclip", CurrentValue = false, Callback = function(V) _G.Noclip = V end})
 
--- [[ TARGET ]] --
+-- [[ TARGET TAB ]] --
 TargetTab:CreateSection("Target Selection")
 TargetTab:CreateInput({Name = "Target Username", PlaceholderText = "Enter name...", Callback = function(T) _G.TargetName = T end})
 TargetTab:CreateButton({
@@ -111,12 +111,12 @@ TargetTab:CreateButton({
     Callback = function()
         local t = GetPlayer(_G.TargetName)
         if t and t.Character then 
-            Player.Character.HumanoidRootPart.CFrame = t.Character.HumanoidRootPart.CFrame
+            Player.Character.HumanoidRootPart.CFrame = t.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3) 
         end
     end
 })
 
--- [[ TROLL ]] --
+-- [[ TROLL TAB ]] --
 TrollTab:CreateSection("Troll Actions")
 TrollTab:CreateInput({Name = "Troll Target", PlaceholderText = "Enter target...", Callback = function(T) _G.TrollTarget = T end})
 TrollTab:CreateButton({
@@ -135,18 +135,27 @@ TrollTab:CreateButton({
     end
 })
 
--- [[ SPECTATE ]] --
+-- [[ SPECTATE TAB ]] --
 SpectateTab:CreateSection("Spectator Mode")
-SpectateTab:CreateButton({
-    Name = "Toggle Freecam",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Freecam"))()
-    end
+SpectateTab:CreateToggle({
+   Name = "Enable Spectator",
+   CurrentValue = false,
+   Callback = function(V) 
+       if V then
+           -- Basic Spectate Logic
+           local plrs = game.Players:GetPlayers()
+           if #plrs > 1 then
+                Camera.CameraSubject = plrs[2].Character.Humanoid
+           end
+       else
+           Camera.CameraSubject = Player.Character.Humanoid
+       end
+   end,
 })
 
 Rayfield:Notify({
-   Title = "Riel Hub Loaded",
-   Content = "Top-navigation mode enabled.",
+   Title = "Riel Hub",
+   Content = "UI Loaded Successfully",
    Duration = 5,
    Image = 4483362458,
 })
