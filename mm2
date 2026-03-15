@@ -15,6 +15,7 @@ local Player = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
+local Debris = game:GetService("Debris")
 
 -- GLOBALS
 _G.TargetName = ""
@@ -71,8 +72,19 @@ end
 end
 end
 
+-- FIXED WALK ON AIR
 if _G.WalkAir then
-Hum:ChangeState(Enum.HumanoidStateType.Freefall)
+local root = Character:FindFirstChild("HumanoidRootPart")
+if root then
+local part = Instance.new("Part")
+part.Size = Vector3.new(6,1,6)
+part.Anchored = true
+part.Transparency = 1
+part.CanCollide = true
+part.CFrame = root.CFrame * CFrame.new(0,-3,0)
+part.Parent = workspace
+Debris:AddItem(part,0.1)
+end
 end
 
 -- SIT ON HEAD
@@ -301,37 +313,6 @@ Name="Troll Target",
 PlaceholderText="Enter target...",
 Callback=function(t)
 _G.TrollTarget=t
-end
-})
-
-TrollTab:CreateButton({
-Name="Fling Target",
-Callback=function()
-
-local t = GetPlayer(_G.TrollTarget)
-
-if t and t.Character then
-
-local hrp = Character.HumanoidRootPart
-local thrp = t.Character.HumanoidRootPart
-local old = hrp.CFrame
-
-local spin = Instance.new("BodyAngularVelocity")
-spin.AngularVelocity = Vector3.new(0,999999,0)
-spin.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
-spin.P = math.huge
-spin.Parent = hrp
-
-for i=1,30 do
-hrp.CFrame = thrp.CFrame * CFrame.new(0,0,-1)
-RunService.Heartbeat:Wait()
-end
-
-spin:Destroy()
-hrp.CFrame = old
-
-end
-
 end
 })
 
